@@ -173,6 +173,8 @@ namespace spp2pgs
 
 	std::unique_ptr<StreamEx> OpenTempFile(TCHAR const *path, unsigned __int64 requireFreeSpace);
 
+	unsigned __int64 EstimateTempSpace(__int64 durationMs, Size frameSize);
+
 	void WriteBE(unsigned __int8 * buffer, int index, unsigned __int8 length, unsigned __int64 value);
 	unsigned __int64 ReadBE(unsigned __int8 const * buffer, int index, unsigned __int8 length);
 

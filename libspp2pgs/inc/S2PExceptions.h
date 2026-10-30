@@ -91,6 +91,7 @@ namespace spp2pgs
 		~AvsInitException() {};
 
 		inline AvsInitExceptionType GetType() const { return type; }
+		inline HRESULT GetError() const { return error; }
 
 	private:
 		AvsInitExceptionType type;
@@ -122,6 +123,7 @@ namespace spp2pgs
 		~TempOutputException() {};
 
 		inline TempOutputExceptionType GetType() const { return type; }
+		inline DWORD GetError() const { return error; }
 
 	private:
 		DWORD error;
