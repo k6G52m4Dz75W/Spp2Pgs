@@ -39,7 +39,7 @@ public:
 	void SetForcingTmtCompat(bool flag) { this->isForcingTmtCompat = flag; }
 
 private:
-	unsigned long long maxCachingSize = unsigned long long(1) << 32;
+	unsigned long long maxCachingSize = static_cast<unsigned long long>(256) << 20;
 	int maxImageBlockSize = 0;
 	bool isForcingTmtCompat = false;
 };

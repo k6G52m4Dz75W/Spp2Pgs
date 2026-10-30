@@ -33,12 +33,15 @@ DECLSPEC_NOINLINE HRESULT WINAPI CoCreateInstanceFormDllFile(const IID& rclsid, 
 		}
 		else
 		{
+			hr = HRESULT_FROM_WIN32(ERROR_BAD_DLL_ENTRYPOINT);
 			SetLastError(ERROR_BAD_DLL_ENTRYPOINT);
 		}
 	}
 	else
 	{
-		SetLastError(ERROR_MOD_NOT_FOUND);
+		DWORD const loadError = ::GetLastError();
+		hr = (loadError != ERROR_SUCCESS) ? HRESULT_FROM_WIN32(loadError) : E_FAIL;
+		SetLastError(loadError);
 	}
 
 	return hr;

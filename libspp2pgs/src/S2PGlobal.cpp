@@ -31,12 +31,13 @@ namespace spp2pgs
 		TCHAR tempPathBuffer[MAX_PATH];
 		TCHAR tempFname[MAX_PATH];
 		DWORD result = ::GetTempPath(MAX_PATH, tempPathBuffer);
+		DWORD const tempPathError = result ? ERROR_SUCCESS : ::GetLastError();
 
 		auto const &tempPath = ::PathIsDirectory(path) ? path : tempPathBuffer;
 
 		if (!result)
 		{
-			throw TempOutputException(TempOutputExceptionType::FetchTempOutputPathFailed, result);
+			throw TempOutputException(TempOutputExceptionType::FetchTempOutputPathFailed, tempPathError);
 		}
 
 		ULARGE_INTEGER freeSpace;
@@ -44,21 +45,21 @@ namespace spp2pgs
 
 		if (!result)
 		{
-			throw TempOutputException(TempOutputExceptionType::QueryFreeSpaceFailed, result);
+			throw TempOutputException(TempOutputExceptionType::QueryFreeSpaceFailed, ::GetLastError());
 		}
 
 		if (requireFreeSpace)
 		{
 			if (freeSpace.QuadPart < requireFreeSpace)
 			{
-				throw TempOutputException(TempOutputExceptionType::NotEnoughFreeSpace, result);
+				throw TempOutputException(TempOutputExceptionType::NotEnoughFreeSpace, ERROR_DISK_FULL);
 			}
 		}
 
 		result = ::GetTempFileName(tempPath, _T("a2p"), 0, tempFname);
 		if (!result)
 		{
-			throw TempOutputException(TempOutputExceptionType::FetchTempFileNameFailed, result);
+			throw TempOutputException(TempOutputExceptionType::FetchTempFileNameFailed, ::GetLastError());
 		}
 
 		HANDLE tempFile = ::CreateFile(
@@ -72,10 +73,39 @@ namespace spp2pgs
 			);
 		if (tempFile == INVALID_HANDLE_VALUE)
 		{
-			throw TempOutputException(TempOutputExceptionType::TempFileCreateFailed, result);
+			throw TempOutputException(TempOutputExceptionType::TempFileCreateFailed, ::GetLastError());
 		}
 
 		return unique_ptr<StreamEx>(new Win32StreamEx(tempFile, true, true, true, nullptr));
+	}
+
+	// Conservative estimate of the disk space the epoch cache may occupy.
+	//
+	// The cache rewinds only when an epoch is drained, so the worst case is a
+	// subtitle track without any gap: the whole film stays inside one epoch and
+	// the cache grows for the entire run. Measured peak on 1080p subtitle input
+	// is about 1.4 MiB per minute of video; dense typesetting can be several
+	// times higher, so 8 MiB per minute (roughly 6x the measured rate) is used.
+	// A 256 MiB floor keeps small jobs and dense short clips comfortable.
+	unsigned __int64 EstimateTempSpace(__int64 durationMs, Size frameSize)
+	{
+		unsigned __int64 const floorSize = static_cast<unsigned __int64>(256) << 20;
+		double const bytesPerMinute = 8.0 * 1024 * 1024;
+
+		if (durationMs <= 0)
+		{
+			return floorSize;
+		}
+
+		double const referenceArea = 1920.0 * 1080.0;
+		double areaScale = static_cast<double>(frameSize.Area()) / referenceArea;
+		if (areaScale < 0.25) areaScale = 0.25;
+		if (areaScale > 1.0) areaScale = 1.0;
+
+		double const estimate = (durationMs / 60000.0) * bytesPerMinute * areaScale;
+
+		return (estimate > static_cast<double>(floorSize)) ?
+			static_cast<unsigned __int64>(estimate) : floorSize;
 	}
 
 	unsigned __int64 ReadBE(unsigned __int8 const * buffer, int index, unsigned __int8 length)
