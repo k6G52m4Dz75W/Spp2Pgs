@@ -15,6 +15,7 @@ CHCP 65001 >NUL
 SET "VSLANG=1033"
 
 ECHO Building libspp2pgs then Spp2Pgs.exe (Release x64, toolset v145)
+IF NOT EXIST "%ROOT%bin" MKDIR "%ROOT%bin"
 ECHO.
 "%MSB%" "%ROOT%Spp2Pgs\Spp2Pgs.vcxproj" /nologo /m /t:Rebuild /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v145 /p:VisualStudioVersion=18.0 /p:SolutionDir=%ROOT% /verbosity:minimal "/flp:LogFile=%LOG%;Encoding=UTF-8;Verbosity=minimal"
 SET "RC=%ERRORLEVEL%"

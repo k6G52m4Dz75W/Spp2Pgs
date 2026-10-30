@@ -38,6 +38,7 @@ ECHO.
 IF NOT "%RC%"=="0" GOTO Failed
 
 IF NOT EXIST "%SLNOUT%\VSSppf.dll" GOTO NoDLL
+IF NOT EXIST "%ROOT%bin" MKDIR "%ROOT%bin"
 COPY /Y "%SLNOUT%\VSSppf.dll" "%ROOT%bin\xy-VSSppf64.dll" >NUL
 IF NOT EXIST "%SLNOUT%\VSSppf.pdb" GOTO SkipPdb
 COPY /Y "%SLNOUT%\VSSppf.pdb" "%ROOT%bin\xy-VSSppf64.pdb" >NUL
