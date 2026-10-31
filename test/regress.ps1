@@ -35,7 +35,7 @@ function Convert-Sub {
 
     # A successful conversion has to leave 0 behind, which is what any caller
     # in a pipeline branches on. 1 is a bad command line, 2 a failed
-    # conversion, 3 an exception that escaped.
+    # conversion, 3 an unhandled exception.
     if ($code -ne 0) {
         throw "conversion of $In failed with exit code ${code}:`n$text"
     }

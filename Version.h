@@ -20,7 +20,7 @@
 
 #define SPP2PGS_VERSION_MAJOR 0
 #define SPP2PGS_VERSION_MINOR 10
-#define SPP2PGS_VERSION_PATCH 1
+#define SPP2PGS_VERSION_PATCH 2
 
 /* Comma separated form, for FILEVERSION and PRODUCTVERSION. */
 #define SPP2PGS_VERSION_NUM SPP2PGS_VERSION_MAJOR,SPP2PGS_VERSION_MINOR,SPP2PGS_VERSION_PATCH,0
@@ -28,6 +28,6 @@
 /* String form, for the VALUE entries and for anything shown to the user.
    rc.exe does not implement the # stringize operator, so this is spelled out
    and must be checked against the numbers above when bumping. */
-#define SPP2PGS_VERSION_STR "0.10.1.0"
+#define SPP2PGS_VERSION_STR "0.10.2.0"
 
 #endif /* SPP2PGS_VERSION_H */

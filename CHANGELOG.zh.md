@@ -6,7 +6,7 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [Unreleased]
+## [0.10.2] - 2026-10-31
 
 ### 变更
 - 工作流设置 30 分钟超时，不再沿用默认的六小时；某一步卡住时任务会失败，
@@ -97,6 +97,6 @@
 本记录从 0.10.0 开始。此前的版本由上游
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs) 发布，最后一个为 2016 年 5 月的 0.9.3.7。
 
-[Unreleased]: https://github.com/k6G52m4Dz75W/Spp2Pgs/compare/0.10.1...HEAD
+[0.10.2]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.2
 [0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0
