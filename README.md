@@ -11,7 +11,7 @@ Core of them is a static library, libspp2pgs.
 An external dll, xy-VSSppf, is introduced to deal with subtitle files.  
 It's based on a forked version of xy-VSFilter, rendering and providing subtitles in a more easy way.  
 
-Here is a breif description for all the four parts.
+Here is a brief description for all the four parts.
 
 ## Spp2Pgs*.exe
 An executable converts subtitles to .sup files.  
