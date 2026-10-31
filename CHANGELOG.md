@@ -13,11 +13,11 @@ May 2016.
 ## [0.10.0] - 2026-10-31
 
 ### Added
-- `-H[<nits>]` writes an HDR palette, BT.2020 with the ST 2084 (PQ) transfer
+- `-h[<nits>]` writes an HDR palette, BT.2020 with the ST 2084 (PQ) transfer
   function, for pairing with HDR video. Without it the output stays BT.709 SDR
   and is byte for byte what earlier versions produced.
   - The value is the luminance that white maps to. It is optional and may be
-    attached or separated, so `-H`, `-HDR`, `-H203` and `-H 203` all produce the
+    attached or separated, so `-h`, `-hdr`, `-h203` and `-h 203` all produce the
     same stream. A non-numeric suffix is reported rather than silently ignored.
   - Default 203 nits, the graphics white of ITU-R BT.2408. Values above 500 nits
     are clamped, with a warning.
@@ -27,6 +27,11 @@ May 2016.
 - The version appears on the first line of the help output.
 
 ### Changed
+- The usage text moved to `-help`, which has to be spelled out in full, because
+  `-h` is now the HDR switch. Every option letter is matched regardless of case,
+  so `-H203` still works and `-S 1080` means the same as `-s 1080`. Previously
+  `-h` and `-H` were two different options, which is a fragile thing to ask of a
+  case insensitive command line.
 - The version is defined in one place, `Version.h`, and read from there by the
   three resource scripts and by the .NET assembly info. Previously the values
   were typed into each file by hand and had drifted apart.

@@ -17,7 +17,7 @@ Here is a brief description for all the four parts.
 An executable converts subtitles to .sup files.  
 Usage:  
 `Spp2Pgs -i "X:\Saya1011con.ass" -s 1080 -r 23 "X:\Saya1011con.sup"`  
-Type Spp2Pgs -h for more help.
+Option letters are case insensitive. Type Spp2Pgs -help for more help.
 
 ## libspp2pgs & Spp2PgsNet*.dll
 The core and its CLR library wrapper for .NET framework applications.  
@@ -68,11 +68,11 @@ no field declaring a colour space, so the encoded palette values are the only
 thing that tells a player how to read it. That is why one .ass file still needs
 two different .sup files if it has to serve both SDR and HDR video.
 
-`-H` writes the BT.2020 ST 2084 (PQ) variant. Without it the output stays
+`-h` writes the BT.2020 ST 2084 (PQ) variant. Without it the output stays
 BT.709 SDR, byte for byte as before.
 
-`-H[<nits>]` sets the luminance that RGB white maps to. The value is optional
-and may be attached or separated, so `-H`, `-HDR`, `-H203` and `-H 203` all
+`-h[<nits>]` sets the luminance that RGB white maps to. The value is optional
+and may be attached or separated, so `-h`, `-hdr`, `-h203` and `-h 203` all
 produce the same stream; a non-numeric suffix is reported rather than silently
 ignored. The default is 203 nits,
 the graphics white of BT.2408 -- the level at which a flat white graphic is meant
@@ -84,7 +84,7 @@ BT.2408 is what fills that gap.
 
 Six retail UHD discs were measured at 201-401 nits, with one outlier at 667. The
 default sits at the low, well specified end on purpose: a subtitle that is a
-little dim is harmless, a glaring one is painful. Use `-H250` or `-H300` to match
+little dim is harmless, a glaring one is painful. Use `-h250` or `-h300` to match
 a brighter disc. The ceiling is 500 nits, half the peak most HDR grades are
 mastered to; larger values are clamped.
 
@@ -103,7 +103,7 @@ they come out dim. Measured on the default 203 nit output: RGB white lands on
 looks like a 58% grey -- the familiar "grey subtitles" symptom. This is not a
 defect in the file and not a mismatch caused by remuxing: it happens with the
 original disc played as an ISO too. A correct HDR pipeline renders the 143 of
-`-H203` and the 234 of the SDR output at the same brightness, because both are
+`-h203` and the 234 of the SDR output at the same brightness, because both are
 203 nits. If the HDR variant looks darker than the SDR one, the player is
 skipping PQ for PG streams -- use the SDR output until it does.
 

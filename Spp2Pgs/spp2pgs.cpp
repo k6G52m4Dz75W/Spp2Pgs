@@ -118,11 +118,51 @@ static bool LooksLikeNumber(TCHAR const * s)
 	return true;
 }
 
+// Folds the option letters to lower case and reports whether the command line
+// asks for the usage text.
+//
+// A capital letter is not a meaningful way to pick a different option on a
+// case insensitive system, and -h/-H meaning two different things was exactly
+// that kind of trap, so every option is matched regardless of case. Only the
+// letter itself is folded: a value written straight after it, as in
+// -iC:\Movies\A.ass, keeps the case it was typed with.
+//
+// -h now belongs to the HDR switch, so the usage text has to be asked for as
+// -help. getopt would read "elp" as that switch's value, which is why this
+// runs before getopt sees the command line.
+static bool NormaliseCommandLine(int argc, _TCHAR * argv[])
+{
+	bool tWantHelp = false;
+
+	for (int i = 1; i < argc; ++i)
+	{
+		_TCHAR * t = argv[i];
+		if (t[0] != _T('-') || t[1] == _T('\0')) continue;
+
+		if (_tcsicmp(t, _T("-help")) == 0 || _tcsicmp(t, _T("--help")) == 0)
+		{
+			tWantHelp = true;
+			continue;
+		}
+
+		int const tLetter = (t[1] == _T('-')) ? 2 : 1;
+		if (t[tLetter] != _T('\0'))
+		{
+			t[tLetter] = ( _TCHAR )_totlower(t[tLetter]);
+		}
+	}
+
+	return tWantHelp;
+}
+
 void print_usage(S2PLogger const *logger)
 {
 	logger->Log(S2PLogger::error, _T(
 		"SPP2PGS %d.%d.%d - Convert a VSFilter subtitle to bluray PG stream.\n\n"
 		"USAGE: Spp2Pgs -i \"input.ass\" -s 1080 -r 23 \"output.pgs\"\n"
+		"\t-help\n"
+		"\t\t Print this text. Spelled out in full because -h is the HDR switch;\n"
+		"\t\t every option letter is matched regardless of case.\n"
 		"\t-i <filename>\n"
 		"\t\t Input subtitle file name. Use '-' for a stdin raw input. \n"
 		"\t-f <format>\n"
@@ -166,16 +206,16 @@ void print_usage(S2PLogger const *logger)
 		"\t\t 63     = Errors only.\n"
 		"\t\t 127    = Errors and warnings.\n"
 		"\t\t 144    = Normal outputs. (default)\n"
-		"\t-H[<nits>]\n"
+		"\t-h[<nits>]\n"
 		"\t\t Encode the palette as BT.2020 ST 2084 (PQ) instead of BT.709 SDR.\n"
 		"\t\t <nits> = luminance of RGB white.\n"
 		"\t\t (blank)= 203. (default)\n"
-		"\t\t -H, -HDR, -H203 and -H 203 all mean the same thing here.\n"
+		"\t\t -h, -hdr, -h203 and -h 203 all mean the same thing here.\n"
 		"\t\t 203 is the graphics white of BT.2408 - the level at which a flat\n"
 		"\t\t white graphic is meant to sit - and it is the recommended level\n"
 		"\t\t for white subtitles in HDR production. Retail UHD discs measure\n"
 		"\t\t 201-401 nits, so the default sits at the low, well specified end.\n"
-		"\t\t Raise it to match a brighter disc, e.g. -H250 or -H300.\n"
+		"\t\t Raise it to match a brighter disc, e.g. -h250 or -h300.\n"
 		"\t\t Maximum 500 nits; larger values are clamped. 500 is half the\n"
 		"\t\t 1000 nit peak most HDR grades are mastered to, and PQ is an\n"
 		"\t\t absolute scale, so a high peak display does not brighten a dim\n"
@@ -267,6 +307,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	S2PStdLogger tLogger{ S2PLogger::info + S2PLogger::normal };
 	S2PClaSettings tSettings {};
 
+	if (NormaliseCommandLine(argc, argv))
+	{
+		print_usage(&tLogger);
+		return 0;
+	}
+
 	LPTSTR input = nullptr;
 	LPTSTR output = nullptr;
 	BdViFormat format = BdViFormat::Unknown;
@@ -276,9 +322,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	bool isZeroAnchor = true;
 	int tHdrWhiteRequested = -1;	//as given on the command line, before clamping
 	int const tHdrWhiteCeiling = 500;
-	TCHAR const * tHdrBadSuffix = NULL;	//non-numeric -H argument, reported later
+	TCHAR const * tHdrBadSuffix = NULL;	//non-numeric -h argument, reported later
 
-	static TCHAR const * optlist = _T("hi:f:s:r:n:b:e:z::x::v::H::");
+	static TCHAR const * optlist = _T("h::i:f:s:r:n:b:e:z::x::v::");
 	opterr = 0;
 	for (;;)
 	{
@@ -290,9 +336,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		switch (iOpt)
 		{
-		case 'h':
-			print_usage(&tLogger);
-			return 0;
 		case 'i':
 			input = optarg;
 			break;
@@ -330,13 +373,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			tLogger.SetLogLevel(tValue);
 			break;
-		case 'H':
+		case 'h':
 		{
 			tValue = 203;
-			//H:: makes the value optional, so "-H" alone, "-H203" and
-			//"-HDR" all mean the default. A value written after a space is
-			//still sitting in argv, because getopt only ever attaches an
-			//optional argument; take it when it really is a number.
+			//h:: makes the value optional, so "-h" alone, "-h203" and "-hdr"
+			//all mean the default. A value written after a space is still
+			//sitting in argv, because getopt only ever attaches an optional
+			//argument; take it when it really is a number.
 			TCHAR const * tArg = optarg;
 			if (tArg == NULL && optind < argc && LooksLikeNumber(argv[optind]))
 			{
@@ -352,7 +395,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 				else if (_tcsicmp(tArg, _T("DR")) != 0)
 				{
-					//-HDR is a shorthand for the default; anything else is a
+					//-hdr is a shorthand for the default; anything else is a
 					//typo, so remember it and report it once the log level
 					//has been read rather than silently encoding at 203.
 					tHdrBadSuffix = tArg;
@@ -509,8 +552,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			if (tHdrBadSuffix != NULL)
 			{
 				tLogger.Log(S2PLogger::warning,
-					_T("Warning: \"%s\" in -H is not a number, using %d nits.\n")
-					_T("         Write -H<nits>, e.g. -H250, or -H on its own.\n"),
+					_T("Warning: \"%s\" in -h is not a number, using %d nits.\n")
+					_T("         Write -h<nits>, e.g. -h250, or -h on its own.\n"),
 					tHdrBadSuffix, tSettings.HdrGraphicsWhite());
 			}
 
