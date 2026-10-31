@@ -20,8 +20,58 @@
 
 #include "CompositionEncoder.h"
 
+#include <cmath>
+
 namespace spp2pgs
 {
+
+	// BT.1886 reference EOTF: an 8-bit SDR code value to linear display light.
+	// BT.2408 5.1 maps SDR into PQ through this, not through the inverse of the
+	// BT.709 OETF, which is a camera curve and not the display response.
+	static double SdrToLinear(int value)
+	{
+		return std::pow(value / 255.0, 2.4);
+	}
+
+	// PQ (SMPTE ST 2084) inverse EOTF, from absolute luminance in nits.
+	static double PqEncode(double nits)
+	{
+		static double const c1 = 3424.0 / 4096.0;
+		static double const c2 = 2413.0 / 4096.0 * 32.0;
+		static double const c3 = 2392.0 / 4096.0 * 32.0;
+		static double const m1 = 2610.0 / 16384.0;
+		static double const m2 = 2523.0 / 4096.0 * 128.0;
+
+		double const yp = std::pow(nits / 10000.0, m1);
+
+		return std::pow((c1 + c2 * yp) / (1.0 + c3 * yp), m2);
+	}
+
+	// BT.709 -> BT.2020 primaries in linear light, after BT.2087. Without this,
+	// an SDR red would be read as the far more saturated BT.2020 red.
+	static void ConvertBt709ToBt2020(double &r, double &g, double &b)
+	{
+		static double const m[3][3] = {
+			{ 0.6274, 0.3293, 0.0433 },
+			{ 0.0691, 0.9195, 0.0114 },
+			{ 0.0165, 0.0880, 0.8956 },
+		};
+
+		double const nr = m[0][0] * r + m[0][1] * g + m[0][2] * b;
+		double const ng = m[1][0] * r + m[1][1] * g + m[1][2] * b;
+		double const nb = m[2][0] * r + m[2][1] * g + m[2][2] * b;
+
+		r = nr; g = ng; b = nb;
+	}
+
+	static unsigned __int8 ClipToByte(double value, int low, int high)
+	{
+		int const rounded = static_cast<int>((value < 0) ? (value - 0.5) : (value + 0.5));
+
+		if (rounded < low) return static_cast<unsigned __int8>(low);
+		if (rounded > high) return static_cast<unsigned __int8>(high);
+		return static_cast<unsigned __int8>(rounded);
+	}
 
 	CompositionEncoder::CompositionEncoder(S2PContext const *context, WindowsDescriptor const * windows, GxBufferManager * bufMgr) :
 		S2PControllerBase(context),
@@ -358,6 +408,55 @@ namespace spp2pgs
 		EncodedPalette * const dst = reinterpret_cast<EncodedPalette *>(buffer);
 
 		int const paletteLength = image->GetPaletteLength();
+
+		if (this->Settings()->IsHdrOutput())
+		{
+			// BT.2020 ST 2084 palette. The stream cannot declare its own colour
+			// space, so the encoded values are the only thing that tells a player
+			// how to interpret this palette. Range stays 16-235, which the player
+			// scales by 4 into the 10-bit 64-940 range used by UHD video.
+			//
+			// Chain, following BT.2408 5.1 display-referred mapping:
+			//   BT.1886 EOTF -> BT.709 to BT.2020 primaries (BT.2087)
+			//   -> scale so SDR white lands on the graphics white -> PQ.
+			double const whiteNits = this->Settings()->HdrGraphicsWhite();
+
+			double linear[256];
+			for (int i = 0; i < 256; ++i)
+			{
+				linear[i] = SdrToLinear(i);
+			}
+
+			static double const kr = 0.2627;	//BT.2020
+			static double const kb = 0.0593;
+			static double const kg = 1.0 - kr - kb;
+
+			for (int i = 0; i < paletteLength; ++i)
+			{
+				auto bgr = src[i].bgr;
+				dst[i].i = i;
+				dst[i].a = src[i].a;
+
+				double r = linear[bgr.r];
+				double g = linear[bgr.g];
+				double b = linear[bgr.b];
+
+				ConvertBt709ToBt2020(r, g, b);
+
+				r = PqEncode(r * whiteNits);
+				g = PqEncode(g * whiteNits);
+				b = PqEncode(b * whiteNits);
+
+				double const y = kr * r + kg * g + kb * b;
+
+				dst[i].y = ClipToByte(16.0 + 219.0 * y, 16, 235);
+				dst[i].cb = ClipToByte(128.0 + 224.0 * (b - y) / (2.0 * (1.0 - kb)), 16, 240);
+				dst[i].cr = ClipToByte(128.0 + 224.0 * (r - y) / (2.0 * (1.0 - kr)), 16, 240);
+			}
+
+			return paletteLength * sizeof(EncodedPalette);
+		}
+
 		int const yuvMode = (imageHeight < 720) ? 0 : ((imageHeight > 1080) ? 2 : 1);
 
 		for (int i = 0; i < paletteLength; ++i)

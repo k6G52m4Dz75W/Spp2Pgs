@@ -49,6 +49,18 @@ namespace spp2pgs
 		{
 			return nullptr;
 		}
+
+		// Encode the palette as BT.2020 ST 2084 (PQ) instead of BT.709 SDR.
+		virtual bool IsHdrOutput() const throw()
+		{
+			return false;
+		}
+
+		// Luminance mapped to RGB white in HDR output, in nits.
+		virtual int HdrGraphicsWhite() const throw()
+		{
+			return 203;
+		}
 	};
 
 	class S2PDefaultSettings final
@@ -73,6 +85,16 @@ namespace spp2pgs
 		virtual TCHAR const * TempOutputPath() const throw()
 		{
 			return S2PSettings::TempOutputPath();
+		}
+
+		virtual bool IsHdrOutput() const throw()
+		{
+			return S2PSettings::IsHdrOutput();
+		}
+
+		virtual int HdrGraphicsWhite() const throw()
+		{
+			return S2PSettings::HdrGraphicsWhite();
 		}
 	};
 

@@ -33,14 +33,20 @@ public:
 	unsigned long long MaxCachingSize() const throw() { return maxCachingSize; }
 	int MaxImageBlockSize() const throw() { return maxImageBlockSize; }
 	bool IsForcingTmtCompat() const throw() { return isForcingTmtCompat; }
+	bool IsHdrOutput() const throw() { return isHdrOutput; }
+	int HdrGraphicsWhite() const throw() { return hdrGraphicsWhite; }
 	TCHAR const * TempOutputPath() const throw() { return S2PSettings::TempOutputPath(); }
 
 	void SetMaxCachingSize(unsigned long long maxCachingSize) { this->maxCachingSize = maxCachingSize; }
 	void SetForcingTmtCompat(bool flag) { this->isForcingTmtCompat = flag; }
+	void SetHdrOutput(bool flag) { this->isHdrOutput = flag; }
+	void SetHdrGraphicsWhite(int nits) { this->hdrGraphicsWhite = nits; }
 
 private:
 	unsigned long long maxCachingSize = static_cast<unsigned long long>(256) << 20;
 	int maxImageBlockSize = 0;
 	bool isForcingTmtCompat = false;
+	bool isHdrOutput = false;
+	int hdrGraphicsWhite = 203;
 };
 

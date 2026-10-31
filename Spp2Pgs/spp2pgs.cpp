@@ -105,6 +105,18 @@ BdViFrameRate GetRate(int optValue)
 	}
 }
 
+static bool LooksLikeNumber(TCHAR const * s)
+{
+	if (s == NULL || *s == _T('\0')) return false;
+	if (*s == _T('-') || *s == _T('+')) ++s;
+	if (*s == _T('\0')) return false;
+	for (; *s != _T('\0'); ++s)
+	{
+		if (*s < _T('0') || *s > _T('9')) return false;
+	}
+	return true;
+}
+
 void print_usage(S2PLogger const *logger)
 {
 	logger->Log(S2PLogger::error, _T(
@@ -153,6 +165,25 @@ void print_usage(S2PLogger const *logger)
 		"\t\t 63     = Errors only.\n"
 		"\t\t 127    = Errors and warnings.\n"
 		"\t\t 144    = Normal outputs. (default)\n"
+		"\t-H[<nits>]\n"
+		"\t\t Encode the palette as BT.2020 ST 2084 (PQ) instead of BT.709 SDR.\n"
+		"\t\t <nits> = luminance of RGB white.\n"
+		"\t\t (blank)= 203. (default)\n"
+		"\t\t -H, -HDR, -H203 and -H 203 all mean the same thing here.\n"
+		"\t\t 203 is the graphics white of BT.2408 - the level at which a flat\n"
+		"\t\t white graphic is meant to sit - and it is the recommended level\n"
+		"\t\t for white subtitles in HDR production. Retail UHD discs measure\n"
+		"\t\t 201-401 nits, so the default sits at the low, well specified end.\n"
+		"\t\t Raise it to match a brighter disc, e.g. -H250 or -H300.\n"
+		"\t\t Maximum 500 nits; larger values are clamped. 500 is half the\n"
+		"\t\t 1000 nit peak most HDR grades are mastered to, and PQ is an\n"
+		"\t\t absolute scale, so a high peak display does not brighten a dim\n"
+		"\t\t disc - it only tone maps downwards. What a subtitle brighter than\n"
+		"\t\t the picture does buy you is a place as the brightest object in\n"
+		"\t\t the frame, which pulls the tone mapping of the scene with it.\n"
+		"\t\t Pair this output with HDR video only. SDR video needs the default.\n"
+		"\t\t A player that skips PQ decoding for PG streams draws these values\n"
+		"\t\t as a 58%% grey; use the SDR output there instead.\n"
 		"\t<filename>\n"
 		"\t\t Output file name. Use '-' for a stdout output.\n\n"
 		));
@@ -242,8 +273,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	int begin = -1;
 	int end = -1;
 	bool isZeroAnchor = true;
+	int tHdrWhiteRequested = -1;	//as given on the command line, before clamping
+	int const tHdrWhiteCeiling = 500;
+	TCHAR const * tHdrBadSuffix = NULL;	//non-numeric -H argument, reported later
 
-	static TCHAR const * optlist = _T("hi:f:s:r:n:b:e:z::x::v::");
+	static TCHAR const * optlist = _T("hi:f:s:r:n:b:e:z::x::v::H::");
 	opterr = 0;
 	for (;;)
 	{
@@ -295,6 +329,53 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			tLogger.SetLogLevel(tValue);
 			break;
+		case 'H':
+		{
+			tValue = 203;
+			//H:: makes the value optional, so "-H" alone, "-H203" and
+			//"-HDR" all mean the default. A value written after a space is
+			//still sitting in argv, because getopt only ever attaches an
+			//optional argument; take it when it really is a number.
+			TCHAR const * tArg = optarg;
+			if (tArg == NULL && optind < argc && LooksLikeNumber(argv[optind]))
+			{
+				tArg = argv[optind];
+				++optind;
+			}
+			if (tArg != NULL)
+			{
+				if (*tArg == _T('=')) ++tArg;
+				if (LooksLikeNumber(tArg))
+				{
+					tValue = _ttoi(tArg);
+				}
+				else if (_tcsicmp(tArg, _T("DR")) != 0)
+				{
+					//-HDR is a shorthand for the default; anything else is a
+					//typo, so remember it and report it once the log level
+					//has been read rather than silently encoding at 203.
+					tHdrBadSuffix = tArg;
+				}
+			}
+			if (tValue <= 0)
+			{
+				tValue = 203;
+			}
+			tHdrWhiteRequested = tValue;
+			if (tValue > tHdrWhiteCeiling)
+			{
+				//BT.2408 anchors graphics white at 203 nits. 500 is half the
+				//1000 nit peak most HDR grades are mastered to, so this is
+				//already generous: a subtitle that bright is the brightest
+				//object in every frame it appears in, and it drags the tone
+				//mapping of the picture behind it up with it. Retail discs
+				//measured 201-401 nits, so nothing legitimate is lost here.
+				tValue = tHdrWhiteCeiling;
+			}
+			tSettings.SetHdrGraphicsWhite(tValue);
+			tSettings.SetHdrOutput(true);
+			break;
+		}
 		case 'n':
 		case 'e':
 			end = _ttoi(optarg);
@@ -416,6 +497,35 @@ int _tmain(int argc, _TCHAR* argv[])
 				_T("Video duration is %d.%03d s, temporary cache space reserved: %I64u MB.\n"),
 				static_cast<int>(durationMs / 1000), static_cast<int>(durationMs % 1000),
 				tSettings.MaxCachingSize() >> 20);
+		}
+
+		if (tSettings.IsHdrOutput())
+		{
+			tLogger.Log(S2PLogger::info + S2PLogger::normal,
+				_T("Palette encoded as BT.2020 ST 2084 (PQ), RGB white = %d nits.\n"),
+				tSettings.HdrGraphicsWhite());
+
+			if (tHdrBadSuffix != NULL)
+			{
+				tLogger.Log(S2PLogger::warning,
+					_T("Warning: \"%s\" in -H is not a number, using %d nits.\n")
+					_T("         Write -H<nits>, e.g. -H250, or -H on its own.\n"),
+					tHdrBadSuffix, tSettings.HdrGraphicsWhite());
+			}
+
+			tLogger.Log(S2PLogger::info + S2PLogger::normal,
+				_T("  This stream is only read correctly by a player that decodes\n")
+				_T("  ST 2084 for PG streams. If it looks darker than the default\n")
+				_T("  SDR output, that player does not, so use the SDR output.\n"));
+
+			if (tHdrWhiteRequested > tSettings.HdrGraphicsWhite())
+			{
+				tLogger.Log(S2PLogger::warning,
+					_T("Warning: %d nits is above the %d nits ceiling, using %d nits.\n")
+					_T("         BT.2408 graphics white is 203 nits and retail UHD\n")
+					_T("         discs measure 201-401 nits.\n"),
+					tHdrWhiteRequested, tHdrWhiteCeiling, tSettings.HdrGraphicsWhite());
+			}
 		}
 
 		S2PEncoder tS2P{ &tSettings , &tLogger };
