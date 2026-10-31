@@ -15,7 +15,7 @@ start.
 
 ## What's new
 
-**0.10.0** — 2026-10-31 · [full changelog](CHANGELOG.md) · [release](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0)
+**0.10.1** — 2026-10-31 · [full changelog](CHANGELOG.md) · [release](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1)
 
 - **HDR output.** `-h[<nits>]` writes a BT.2020 ST 2084 (PQ) palette, for
   pairing with HDR video. White defaults to 203 nits, the graphics white of
@@ -37,6 +37,11 @@ start.
   the configurations are still in the project files, but no build emits them.
 - **Option letters are case insensitive**, and help moved to `-help` so that
   `-h` could become the HDR switch. `-H203` still works.
+- **The exit status means something.** 0 is a written file, 1 a bad command
+  line, 2 a failed conversion, 3 an exception. A run that worked used to exit
+  with 1, the same code a mistyped command line gave.
+- **Builds run on GitHub Actions**, which compiles both binaries from the tagged
+  source and runs a regression check on them, instead of taking an upload.
 
 That is the headline only; [`CHANGELOG.md`](CHANGELOG.md) has every entry.
 

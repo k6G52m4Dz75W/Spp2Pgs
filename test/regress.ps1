@@ -33,10 +33,10 @@ function Convert-Sub {
     }
     $text = $lines -join "`n"
 
-    # The converter returns 1 on success, not 0. main() passes back whatever
-    # Spp2Pgs::Encode returned, which is 1 when it worked, 2 for a failed open
-    # and 3 for an exception. Until that is changed, success is 1.
-    if ($code -ne 1) {
+    # A successful conversion has to leave 0 behind, which is what any caller
+    # in a pipeline branches on. 1 is a bad command line, 2 a failed
+    # conversion, 3 an exception that escaped.
+    if ($code -ne 0) {
         throw "conversion of $In failed with exit code ${code}:`n$text"
     }
     if ($text -notmatch 'Encoding successfully completed') {
@@ -78,6 +78,24 @@ Write-Host ("hdr   {0}  {1} bytes" -f $hdr, $sizeHdr)
 Write-Host ''
 
 $failures = @()
+
+# The exit code is part of the interface: a caller in a pipeline or a CI step
+# branches on it, so a bad command line must not be indistinguishable from a
+# run that worked, and -help must not look like a failure.
+$saved = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+try {
+    & $exe -i 'test\solid.ass' -s 9999 -r 23 '.tmp\useless.sup' 2>&1 | Out-Null
+    $usageCode = $LASTEXITCODE
+    & $exe -help 2>&1 | Out-Null
+    $helpCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $saved
+}
+Write-Host "exit codes: usage $usageCode, help $helpCode"
+if ($usageCode -eq 0) { $failures += 'a bad command line exited with 0, which reads as success' }
+if ($helpCode -ne 0) { $failures += "-help exited with $helpCode instead of 0" }
+
 if ($frames -ne 120) { $failures += "expected 120 frames, got $frames" }
 if ($framesNoEol -ne $frames) { $failures += 'a missing trailing line break changed the frame count' }
 if ($noeol -ne $sdr) { $failures += 'a missing trailing line break changed the stream (issue #6)' }

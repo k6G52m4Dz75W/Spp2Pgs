@@ -40,6 +40,19 @@
 
 using namespace spp2pgs;
 
+//Process exit codes. Scripts and CI steps branch on these, so they are part of
+//the interface: 0 has to mean the file was written, and nothing else may use
+//it. S2PEncoder::Encode returns bool - true for success - and an earlier
+//revision assigned that straight to an int, which is how a run that had worked
+//came to exit with 1, the same code a mistyped command line produced.
+enum ExitCode
+{
+	ExitSuccess = 0,
+	ExitUsage = 1,				//the command line did not make sense
+	ExitConversionFailed = 2,	//input, output or temporary file
+	ExitUnexpected = 3,			//an exception came from somewhere else
+};
+
 BdViFormat GetFormat(int optValue)
 {
 	switch (optValue)
@@ -229,6 +242,8 @@ void print_usage(S2PLogger const *logger)
 		"\t\t as a 58%% grey; use the SDR output there instead.\n"
 		"\t<filename>\n"
 		"\t\t Output file name. Use '-' for a stdout output.\n\n"
+		"Exit status: 0 the file was written, 1 the command line was wrong,\n"
+		"\t 2 the conversion failed, 3 an unexpected error.\n\n"
 		), SPP2PGS_VERSION_MAJOR, SPP2PGS_VERSION_MINOR, SPP2PGS_VERSION_PATCH);
 }
 
@@ -448,7 +463,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (misUse)
 	{
 		print_usage(&tLogger);
-		return 1;
+		return ExitUsage;
 	}
 
 	FILE * ofile = (*output == _T('-') && output[1] == _T('\0')) ?
@@ -459,13 +474,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (misUse)
 	{
 		print_usage(&tLogger);
-		return 1;
+		return ExitUsage;
 	}
 	
 	CfileStreamEx ostream = CfileStreamEx(ofile, false, true, false, nullptr);
 	CfileStreamEx istream = CfileStreamEx(stdin, true, false, false, nullptr);
 
-	int tRet = 0;
+	int tRet = ExitConversionFailed;
 	try
 	{
 		std::auto_ptr<FrameStream> avstream(nullptr);
@@ -583,22 +598,29 @@ int _tmain(int argc, _TCHAR* argv[])
 			tPgsEnc.RegistAnchor(avstream->GetAdvisor()->GetFrameIndexOffset());
 		}
 
-		tRet = tS2P.Encode(avstream.get(), &tPgsEnc, nullptr);
-		
+		if (!tS2P.Encode(avstream.get(), &tPgsEnc, nullptr))
+		{
+			//Encode throws for the failures it can describe and returns false for
+			//the ones it cannot. Either way the file is not known to be good, so
+			//the code has to stay non-zero.
+			tLogger.Log(S2PLogger::error, _T("Encoding failed.\n"));
+			return ExitConversionFailed;
+		}
+
 		tLogger.Log(S2PLogger::info + S2PLogger::normal, _T("Done.\n"));
 
-		return tRet;
+		return ExitSuccess;
 	}
 	catch (EndUserException ex)
 	{
-		tRet = 2;
+		tRet = ExitConversionFailed;
 		TCHAR buffer[S2PException::MaxBufferSize];
 		ex.FormatMessage(buffer, S2PException::MaxBufferSize);
 		tLogger.Log(S2PLogger::error, buffer);
 	}
 	catch (TempOutputException & ex)
 	{
-		tRet = 2;
+		tRet = ExitConversionFailed;
 
 		TCHAR tempPath[MAX_PATH] = { 0 };
 		::GetTempPath(MAX_PATH, tempPath);
@@ -632,7 +654,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	catch (AvsInitException & ex)
 	{
-		tRet = 2;
+		tRet = ExitConversionFailed;
 
 		HRESULT const errorCode = ex.GetError();
 		TCHAR const * const errorHint = AvsInitErrorHint(errorCode);
@@ -654,12 +676,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	catch (std::bad_alloc &)
 	{
-		tRet = 3;
+		tRet = ExitUnexpected;
 		tLogger.Log(S2PLogger::error, _T("Out of memory: not enough memory to continue.\n"));
 	}
 	catch (std::exception & ex)
 	{
-		tRet = 3;
+		tRet = ExitUnexpected;
 		tLogger.Log(S2PLogger::error,
 			_T("Unexpected standard exception: %hs\n"
 			"\tIf this happened right after startup, check that the xy-VSsppf DLL\n"
@@ -667,7 +689,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	catch (...)
 	{
-		tRet = 3;
+		tRet = ExitUnexpected;
 		tLogger.Log(S2PLogger::error,
 			_T("Unknown exception: neither an encoding error nor a standard exception.\n"
 			"\tIt was raised by Spp2Pgs itself or by the subtitle filter DLL.\n"

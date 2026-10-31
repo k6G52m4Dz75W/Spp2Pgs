@@ -6,6 +6,36 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1] - 2026-10-31
+
+### Added
+- A GitHub Actions workflow that builds both binaries on a hosted runner, runs
+  the regression check below and, when a tag is pushed, attaches the zip and the
+  source tarball to a draft release. The binaries are built there rather than
+  uploaded, so the dll can be seen to come from the source in the tree.
+- `test/regress.ps1`, with samples that draw a rectangle using the ASS drawing
+  commands instead of setting text, so the result does not depend on which fonts
+  the machine has. It checks the frame count, that a file without a trailing
+  line break yields the same stream as one with it, that `-h` reaches a
+  different palette, and that the exit codes mean what they say.
+- `tools/package_release.py`, which builds both archives -- the source tarball
+  with the submodule inside it -- and refuses to run when the tag and `Version.h`
+  disagree.
+
+### Changed
+- The two build scripts find Visual Studio through `vswhere` and pick the MSVC
+  toolset by looking for the MFC headers, instead of naming a path and a version
+  that only match the machine they were written on. They return a non-zero
+  status when a build fails, and they skip the interactive shell when `CI` is
+  set, which is what lets a workflow step run them.
+
+### Fixed
+- A run that wrote its file reported exit status 1, the same value a mistyped
+  command line returned. `main` passed the `bool` from `S2PEncoder::Encode` back
+  to the operating system as an `int`, where `true` is 1, so no caller could
+  tell success from a usage error. Success is 0 now, a bad command line 1, a
+  failed conversion 2 and an escaped exception 3. `-help` lists them.
+
 ## [0.10.0] - 2026-10-31
 
 ### Added
@@ -90,4 +120,5 @@ This changelog begins at 0.10.0. Earlier releases were published upstream at
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs), the last of them 0.9.3.7 in
 May 2016.
 
+[0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0

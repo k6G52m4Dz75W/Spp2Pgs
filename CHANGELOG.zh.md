@@ -6,6 +6,29 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.10.1] - 2026-10-31
+
+### 新增
+- GitHub Actions 工作流：在托管运行器上编译两个二进制，运行下述回归检查，
+  推送 tag 时把 zip 与源码包挂到 draft release 上。二进制在那里编译而非上传，
+  因此可以看出该 DLL 确实来自仓库中的源码。
+- `test/regress.ps1`，样例用 ASS 绘图指令画矩形而不写文字，结果因此不依赖
+  本机装了什么字体。检查项为帧数、末行无换行时是否产出相同的流、`-h` 是否
+  走到另一套调色板，以及退出码是否与其含义相符。
+- `tools/package_release.py`，生成两个归档（源码包含子模块），当 tag 与
+  `Version.h` 不一致时拒绝执行。
+
+### 变更
+- 两个编译脚本改用 `vswhere` 定位 Visual Studio，并通过查找 MFC 头文件确定
+  MSVC 工具集，不再写死只对某个机器成立的路径与版本号。编译失败时返回非零
+  状态，设置了 `CI` 时不再进入交互式 shell，工作流步骤因此可以调用它们。
+
+### 修复
+- 成功写出文件时退出码为 1，与命令行写错时返回的值相同。原因是 `main` 把
+  `S2PEncoder::Encode` 的 `bool` 直接当作 `int` 返回给系统，而 `true` 就是 1，
+  调用方无法区分成功与用法错误。现在成功为 0、命令行错误为 1、转换失败为 2、
+  逃逸的异常为 3，`-help` 中一并列出。
+
 ## [0.10.0] - 2026-10-31
 
 ### 新增
@@ -66,4 +89,5 @@
 本记录从 0.10.0 开始。此前的版本由上游
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs) 发布，最后一个为 2016 年 5 月的 0.9.3.7。
 
+[0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0
