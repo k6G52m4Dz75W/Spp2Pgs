@@ -1,4 +1,7 @@
 # Spp2Pgs
+
+[English](README.md) | [简体中文](README.zh.md)
+
 Converts general subtitles to HDMV PG streams.  
 In other words, converts .ass files to .sup files.
 
@@ -57,6 +60,73 @@ using (var tOutput = tS2P.CreatePgsEncoder(tOutputStream, BdViFormat.Vi1080i, Bd
 xy-VobSub SubPicProvider Factory. This is a COM dll, exposing an ISubPicProviderAlfa interface to Spp2Pgs.  
 It's a necessary part for Spp2Pgs.
 
+
+## HDR output (BT.2020 / ST 2084)
+A UHD Blu-ray keeps two separate subtitle pools: SDR graphics on PIDs
+`0x1200-0x121F` and HDR graphics on `0x12A0-0x12BF`. The PG stream itself carries
+no field declaring a colour space, so the encoded palette values are the only
+thing that tells a player how to read it. That is why one .ass file still needs
+two different .sup files if it has to serve both SDR and HDR video.
+
+`-H` writes the BT.2020 ST 2084 (PQ) variant. Without it the output stays
+BT.709 SDR, byte for byte as before.
+
+`-H[<nits>]` sets the luminance that RGB white maps to. The value is optional
+and may be attached or separated, so `-H`, `-HDR`, `-H203` and `-H 203` all
+produce the same stream; a non-numeric suffix is reported rather than silently
+ignored. The default is 203 nits,
+the graphics white of BT.2408 -- the level at which a flat white graphic is meant
+to sit, and the recommended level for white subtitles in HDR production. The UHD
+Blu-ray format itself defines only the colour encoding, ST 2084 CLUT values
+multiplied by 4; it says nothing about how bright a subtitle should be, and its
+own white paper notes that HDR subtitle workflows were still being evaluated.
+BT.2408 is what fills that gap.
+
+Six retail UHD discs were measured at 201-401 nits, with one outlier at 667. The
+default sits at the low, well specified end on purpose: a subtitle that is a
+little dim is harmless, a glaring one is painful. Use `-H250` or `-H300` to match
+a brighter disc. The ceiling is 500 nits, half the peak most HDR grades are
+mastered to; larger values are clamped.
+
+PQ is an absolute scale, so a display with a high peak does not brighten a dim
+disc -- tone mapping only ever pulls values down, never up. What a subtitle
+brighter than the picture does buy you is the wrong kind of attention: it becomes
+the brightest object in the frame, and adaptive tone mapping reads that as the
+scene's peak and dims the picture behind it.
+
+The palette stays 8-bit. PQ is applied to the values, not to the bit depth.
+Keep this output paired with HDR video.
+
+A player that does not decode PQ shows these values as ordinary 8-bit luma, and
+they come out dim. Measured on the default 203 nit output: RGB white lands on
+147/255 while the same text in the SDR variant lands on 253/255, so the HDR file
+looks like a 58% grey -- the familiar "grey subtitles" symptom. This is not a
+defect in the file and not a mismatch caused by remuxing: it happens with the
+original disc played as an ISO too. A correct HDR pipeline renders the 143 of
+`-H203` and the 234 of the SDR output at the same brightness, because both are
+203 nits. If the HDR variant looks darker than the SDR one, the player is
+skipping PQ for PG streams -- use the SDR output until it does.
+
+## Building
+Two scripts in the repository root, run in this order:
+
+1. `build_sppf.bat` builds the subtitle provider and drops `xy-VSSppf64.dll`
+   into `bin\`.
+2. `build_core.bat` builds `libspp2pgs`, then `Spp2Pgs64.exe`, also into `bin\`.
+
+Both expect Visual Studio Build Tools with the v145 toolset and the MFC
+libraries; the install path is set at the top of each script. `build_sppf.bat`
+needs the submodule first:
+
+```
+git submodule update --init --recursive
+```
+
+## Version
+A single file, `Version.h`, holds the version, and the three resource scripts
+plus the .NET assembly info read it from there. It has three significant parts,
+`MAJOR.MINOR.PATCH`; the fourth number that the Windows version resource
+requires is fixed at 0. Released versions are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## Special Thanks
 * This projects starts on basis of [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/)

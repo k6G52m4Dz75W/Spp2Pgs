@@ -1,0 +1,45 @@
+# Changelog
+
+[English](CHANGELOG.md) | [简体中文](CHANGELOG.zh.md)
+
+All notable changes to this project are documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+This changelog begins at 0.10.0. Earlier releases were published upstream at
+[subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs), the last of them 0.9.3.7 in
+May 2016.
+
+## [0.10.0] - 2026-10-31
+
+### Added
+- `-H[<nits>]` writes an HDR palette, BT.2020 with the ST 2084 (PQ) transfer
+  function, for pairing with HDR video. Without it the output stays BT.709 SDR
+  and is byte for byte what earlier versions produced.
+  - The value is the luminance that white maps to. It is optional and may be
+    attached or separated, so `-H`, `-HDR`, `-H203` and `-H 203` all produce the
+    same stream. A non-numeric suffix is reported rather than silently ignored.
+  - Default 203 nits, the graphics white of ITU-R BT.2408. Values above 500 nits
+    are clamped, with a warning.
+- `build_sppf.bat` and `build_core.bat`, which build the whole thing with
+  Visual Studio Build Tools. Output goes to `bin\`.
+- `README.zh.md` and `CHANGELOG.zh.md`, alongside the English originals.
+
+### Changed
+- The version is defined in one place, `Version.h`, and read from there by the
+  three resource scripts and by the .NET assembly info. Previously the values
+  were typed into each file by hand and had drifted apart.
+- Version number raised to 0.10.0, three parts instead of four. The fourth field
+  of the Windows version resource is now fixed at 0.
+- The xy-VSFilter submodule points at a fork maintained here, so that the fixes
+  below can be carried.
+
+### Fixed
+- A subtitle whose last line has no trailing line break is no longer dropped.
+  Depending on the timing, the line either disappeared entirely or lost its
+  picture while the text survived.
+- A pointer truncation in the x64 rasterizer, inherited from upstream.
+
+## Links
+
+[0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0
