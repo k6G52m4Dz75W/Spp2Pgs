@@ -10,6 +10,24 @@
 另有一个外部 DLL `xy-VSSppf` 负责处理字幕文件，它基于 xy-VSFilter 的一个分叉版本，
 以更简单的方式渲染并提供字幕。
 
+## 最新版本
+
+**0.10.0** — 2026-10-31 · [完整更新记录](CHANGELOG.zh.md) · [发布页](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0)
+
+- **HDR 输出。** `-h[<nits>]` 输出 BT.2020 ST 2084（PQ）调色板，用于与 HDR 视频配对。
+  白色默认 203 尼特，即 BT.2408 的图形白，上限 500。不加该选项则输出不变。
+- **末行不再丢失**：字幕文件结尾没有换行符时，最后一行照常编码。
+- **修复 x64 光栅化器的指针截断**，该问题继承自上游。
+- **出错时说清原因。** 临时目录、可用空间与所需空间、Windows 错误码及通俗提示、
+  输入流打开失败的 HRESULT，以及 xy-VSSppf DLL 缺失或位数不符，都会明确报出 ——
+  旧版只给出 `code 0` 或「Unknown exception」。
+- **临时空间按视频时长估算**，不再每次固定预留 4 GiB。
+- **重新可编译。** `build_sppf.bat` 与 `build_core.bat` 使用 Visual Studio 2026（v145）
+  与 SDK 10.0.26100；解决方案自带的 v100/v140 工具集已无法安装。
+- **选项字母不区分大小写**，帮助移至 `-help`，以便把 `-h` 让给 HDR 开关。`-H203` 依然有效。
+
+以上只是要点，条目完整见 [`CHANGELOG.zh.md`](CHANGELOG.zh.md)。
+
 下面分别说明这四个部分。
 
 ## Spp2Pgs*.exe
@@ -108,7 +126,8 @@ git submodule update --init --recursive
 ## 版本
 版本号只在 `Version.h` 一处定义，三个资源脚本与 .NET 程序集信息都从那里读取。
 它有三个有效部分，即 `MAJOR.MINOR.PATCH`；Windows 版本资源强制要求的第四段固定为 0。
-已发布版本见 [CHANGELOG.zh.md](CHANGELOG.zh.md)。
+已发布版本见 [CHANGELOG.zh.md](CHANGELOG.zh.md)，最新版本在
+[发布页](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases)。
 
 ## 特别致谢
 * 本项目基于 [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/) 起步

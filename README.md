@@ -11,6 +11,31 @@ Core of them is a static library, libspp2pgs.
 An external dll, xy-VSSppf, is introduced to deal with subtitle files.  
 It's based on a forked version of xy-VSFilter, rendering and providing subtitles in a more easy way.  
 
+## What's new
+
+**0.10.0** — 2026-10-31 · [full changelog](CHANGELOG.md) · [release](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0)
+
+- **HDR output.** `-h[<nits>]` writes a BT.2020 ST 2084 (PQ) palette, for
+  pairing with HDR video. White defaults to 203 nits, the graphics white of
+  BT.2408, and is capped at 500. Without the option the output is unchanged.
+- **The last line is no longer dropped** from a subtitle file that has no
+  trailing line break.
+- **A pointer truncation in the x64 rasterizer is fixed**, inherited from
+  upstream.
+- **Failures say what went wrong.** The temporary folder, the free and the
+  required space, the Windows error code with a plain-language hint, the
+  HRESULT of a failed input open, and a missing or wrong-bitness xy-VSSppf DLL
+  named as such -- where the old build printed `code 0` or "Unknown exception".
+- **Temporary space is sized from the video** instead of reserving a fixed
+  4 GiB for every run.
+- **It builds again.** `build_sppf.bat` and `build_core.bat` drive Visual
+  Studio 2026 (v145) and SDK 10.0.26100; the toolset v100/v140 that the
+  solutions themselves reference can no longer be installed.
+- **Option letters are case insensitive**, and help moved to `-help` so that
+  `-h` could become the HDR switch. `-H203` still works.
+
+That is the headline only; [`CHANGELOG.md`](CHANGELOG.md) has every entry.
+
 Here is a brief description for all the four parts.
 
 ## Spp2Pgs*.exe
@@ -126,7 +151,9 @@ git submodule update --init --recursive
 A single file, `Version.h`, holds the version, and the three resource scripts
 plus the .NET assembly info read it from there. It has three significant parts,
 `MAJOR.MINOR.PATCH`; the fourth number that the Windows version resource
-requires is fixed at 0. Released versions are listed in [CHANGELOG.md](CHANGELOG.md).
+requires is fixed at 0. Released versions are listed in
+[CHANGELOG.md](CHANGELOG.md), and the newest one is on the
+[releases page](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases).
 
 ## Special Thanks
 * This projects starts on basis of [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/)

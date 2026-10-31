@@ -22,10 +22,12 @@ May 2016.
   - Default 203 nits, the graphics white of ITU-R BT.2408. Values above 500 nits
     are clamped, with a warning.
 - `build_sppf.bat` and `build_core.bat`, which build the whole thing with
-  Visual Studio Build Tools and drop the results in `bin\`. The solutions in the
-  repository reference toolset v100/v140 and Windows SDK 8.1, none of which can
-  be installed any more.
+  Visual Studio Build Tools and drop the results in `bin\`, creating that
+  directory on the way so a fresh clone builds without any preparation. The
+  solutions in the repository reference toolset v100/v140 and Windows SDK 8.1,
+  none of which can be installed any more.
 - `README.zh.md` and `CHANGELOG.zh.md`, alongside the English originals.
+  `Readme.md` is now `README.md`.
 - The version appears on the first line of the help output.
 
 ### Changed
@@ -47,9 +49,16 @@ May 2016.
   Depending on the timing, the line either disappeared entirely or lost its
   picture while the text survived.
 - A pointer truncation in the x64 rasterizer, inherited from upstream.
-- Temporary cache space is estimated from the video duration instead of
-  reserving a fixed 4 GiB, and a disk failure reports its real error code rather
-  than "code 0".
+- Temporary cache space is estimated from the video duration and frame size --
+  8 MiB per minute, scaled by the resolution ratio, with a 256 MiB floor --
+  instead of reserving a fixed 4 GiB for every run. The duration and the space
+  reserved are printed when encoding starts.
+- A failing run now reports what went wrong instead of `code 0`: which
+  temporary-output step failed, the temporary folder, the free and the required
+  space, the Windows error code with a plain-language hint, and the HRESULT of
+  a failed input open. A missing xy-VSSppf DLL is told apart from an empty or
+  unreadable subtitle file, a wrong-bitness DLL is named as such, and running
+  out of memory is reported as such rather than as an unknown exception.
 
 ## Links
 
