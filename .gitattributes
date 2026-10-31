@@ -2,3 +2,9 @@
 # deliberately missing its final line break. Keep both exactly as committed,
 # with no end of line translation on checkout.
 test/*.ass -text
+
+# Workflow files are read by GitHub, not by Visual Studio, so holding them to a
+# single line ending keeps the working copy from reporting a change on every
+# checkout under core.autocrlf.
+.github/workflows/*.yml text eol=lf
+.gitattributes text eol=lf
