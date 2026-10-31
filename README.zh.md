@@ -5,18 +5,9 @@
 把 ASS/SSA、SRT、SAMI 与 DVD 字幕转换为蓝光 PGS sup 文件，可选输出
 HDR（BT.2020 ST 2084）调色板。
 
-「PGS sup」把格式和后缀一起说清：PGS 是格式（HDMV PG 流），.sup 是这类文件通常
-使用的后缀。两者是同一份流，.pgs 文件的字节完全相同，但很多工具按后缀挑选文件，
-不会把它列进可打开的清单里，所以本文的示例一律写 .sup。HD DVD 当年也用 .sup，
-装的却是另一种格式，这是应该写「PGS sup」而不是光写「.sup」的另一个理由。
-
-名字里的 `Spp` 是 `SubPicProvider` 的缩写，指 VSFilter 一系渲染器对外提供的 COM 接口。
-本工具不解析 .ass，它按时间从该接口取位图，再把位图编码成 PG 流，所以这个名字说的是
-「从字幕提供器到 PG 流」，而不是「从 ASS 到 PGS」。
-
 本项目产出一个命令行程序和一个 CLR 动态库，两者的核心是一个静态库 libspp2pgs。
 
-另有一个外部 DLL `xy-VSSppf`，负责实现这个接口。它基于 xy-VSFilter 的一个分叉版本，
+另有一个外部 DLL `xy-VSSppf` 负责处理字幕文件。它基于 xy-VSFilter 的一个分叉版本，
 把字幕在指定时刻渲染成位图，字幕格式的解析与特效渲染都在这里完成。它必须与 exe
 放在同一目录，否则程序无法启动编码。
 
@@ -145,6 +136,16 @@ git submodule update --init --recursive
 它有三个有效部分，即 `MAJOR.MINOR.PATCH`；Windows 版本资源强制要求的第四段固定为 0。
 已发布版本见 [CHANGELOG.zh.md](CHANGELOG.zh.md)，最新版本在
 [发布页](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases)。
+
+## 命名
+名字里的 `Spp` 是 `SubPicProvider` 的缩写，指 VSFilter 一系渲染器对外提供的 COM 接口。
+本工具不解析 .ass，它按时间从该接口取位图，再把位图编码成 PG 流，所以这个名字说的是
+「从字幕提供器到 PG 流」，而不是「从 ASS 到 PGS」。
+
+输出文件称为「PGS sup」：PGS 是格式（HDMV PG 流），.sup 是这类文件通常使用的后缀。
+两者是同一份流，.pgs 文件的字节完全相同，但很多工具按后缀挑选文件，不会把它列进
+可打开的清单里，所以本文的示例一律写 .sup。HD DVD 当年也用 .sup，装的却是另一种
+格式，这是应该写「PGS sup」而不是光写「.sup」的理由。
 
 ## 特别致谢
 * 本项目基于 [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/) 起步

@@ -5,22 +5,10 @@
 Convert ASS/SSA, SRT, SAMI and DVD subtitles to Blu-ray PGS sup files with
 optional HDR (BT.2020 ST 2084) palette support.
 
-The phrase "PGS sup" names the format and the extension at once: PGS is the
-format -- an HDMV PG stream -- and .sup is the extension such a file is normally
-given. They are one stream -- a .pgs file holds the same bytes -- but many tools
-pick files by extension and will not offer to open one, so the examples here end
-in .sup. HD DVD also used .sup, for an unrelated format, which is the other
-reason to write "PGS sup" rather than a bare ".sup".
-
-The `Spp` in the name is `SubPicProvider`, the COM interface that the VSFilter
-family of renderers exposes. This tool does not parse .ass: it asks that
-interface for a bitmap at each moment in time and encodes what comes back. The
-name says subtitle provider to PG stream, not ASS to PGS.
-
 The project generates a command line application and a CLR dll file.  
 Core of them is a static library, libspp2pgs.
 
-An external dll, xy-VSSppf, implements that interface. It is based on a forked
+An external dll, xy-VSSppf, deals with subtitle files. It is based on a forked
 version of xy-VSFilter and does the parsing and the rendering: given a moment in
 time, it returns a bitmap. It has to sit next to the exe, or encoding cannot
 start.  
@@ -176,6 +164,19 @@ plus the .NET assembly info read it from there. It has three significant parts,
 requires is fixed at 0. Released versions are listed in
 [CHANGELOG.md](CHANGELOG.md), and the newest one is on the
 [releases page](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases).
+
+## Naming
+`Spp` is `SubPicProvider`, the COM interface that the VSFilter family of
+renderers exposes. This tool does not parse .ass: it asks that interface for a
+bitmap at each moment in time and encodes what comes back. The name says
+subtitle provider to PG stream, not ASS to PGS.
+
+The output is a "PGS sup": PGS is the format, an HDMV PG stream, and .sup is the
+extension such a file is normally given. They are one stream -- a .pgs file
+holds the same bytes -- but many tools pick files by extension and will not
+offer to open one, so the examples here end in .sup. HD DVD also used .sup, for
+an unrelated format, which is the reason to write "PGS sup" rather than a bare
+".sup".
 
 ## Special Thanks
 * This projects starts on basis of [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/)
