@@ -1,0 +1,58 @@
+name: build
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build xy-VSFilter
+        shell: cmd
+        run: build_sppf.bat
+
+      - name: Build Spp2Pgs
+        shell: cmd
+        run: build_core.bat
+
+      - name: Regression
+        shell: pwsh
+        run: ./test/regress.ps1
+
+      - name: Package
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            python tools/package_release.py --out artifacts --expect-tag $env:GITHUB_REF_NAME
+          } else {
+            python tools/package_release.py --out artifacts
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Spp2Pgs-x64
+          path: artifacts/*
+          if-no-files-found: error
+
+      - name: Draft release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: ${{ github.ref_name }}
+          files: artifacts/*
+          generate_release_notes: false

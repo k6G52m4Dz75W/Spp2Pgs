@@ -1,0 +1,4 @@
+# The regression samples are compared byte for byte, and one of them is
+# deliberately missing its final line break. Keep both exactly as committed,
+# with no end of line translation on checkout.
+test/*.ass -text
