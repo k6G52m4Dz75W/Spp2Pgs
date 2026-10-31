@@ -204,16 +204,11 @@ scaled up to the output canvas.
 When `LayoutRes` equals the output canvas, or neither setting is present, the
 output is byte-identical to 0.10.1.
 
-How this tool handles them:
-
-- Ignored or not: not ignored. The two settings declare the rasterisation base the
+- **They are not ignored.** The two settings declare the rasterisation base the
   author chose, and ignoring them would depart from what the file says.
-- Scripts written for this tool: neither setting is needed, because the output
-  canvas is fixed and nothing is reused across resolutions.
-- Scripts written elsewhere: rendered as declared, which matches what the author
-  saw.
-- Reproducing 0.10.1 output: remove the two lines; the old version does not
-  recognise them and always rasterises at the output canvas.
+- **They are not required.** The output canvas of this tool is fixed and nothing
+  is reused across resolutions, so a script written for it needs neither.
+- Removing the two lines makes the program behave as 0.10.1 and earlier did.
 
 ## Building
 Two scripts in the repository root, run in this order:
