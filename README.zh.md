@@ -9,10 +9,15 @@
 列进可打开的清单里，所以本文的示例一律写 .sup。HD DVD 当年也用 .sup，装的却是
 另一种格式，这是应该写「PGS sup」而不是光写「.sup」的另一个理由。
 
+名字里的 `Spp` 是 `SubPicProvider` 的缩写，指 VSFilter 一系渲染器对外提供的 COM 接口。
+本工具不解析 .ass，它按时间从该接口取位图，再把位图编码成 PG 流，所以这个名字说的是
+「从字幕提供器到 PG 流」，而不是「从 ASS 到 PGS」。
+
 本项目产出一个命令行程序和一个 CLR 动态库，两者的核心是一个静态库 libspp2pgs。
 
-另有一个外部 DLL `xy-VSSppf` 负责处理字幕文件，它基于 xy-VSFilter 的一个分叉版本，
-以更简单的方式渲染并提供字幕。
+另有一个外部 DLL `xy-VSSppf`，负责实现这个接口。它基于 xy-VSFilter 的一个分叉版本，
+把字幕在指定时刻渲染成位图，字幕格式的解析与特效渲染都在这里完成。它必须与 exe
+放在同一目录，否则程序无法启动编码。
 
 ## 最新版本
 
@@ -41,6 +46,11 @@
 用法：  
 `Spp2Pgs -i "X:\Saya1011con.ass" -s 1080 -r 23 "X:\Saya1011con.sup"`  
 选项字母不区分大小写。执行 `Spp2Pgs -help` 可查看完整帮助。
+
+只要 xy-VSSppf 能打开的文本字幕都可以作为输入，格式由解析文件判定，不看后缀。
+实测通过的有 ASS 与 SSA、SRT、SAMI（`.smi`）、MicroDVD（`.sub`）、MPL2（`.txt`）
+与 RealText（`.rt`）。VobSub 需要 `.idx` 与 `.sub` 成对提供，尚未实测。
+`.sup` 不能作为输入，它是图形流而不是文本。
 
 ## libspp2pgs & Spp2PgsNet*.dll
 核心库及其 .NET 框架的 CLR 包装。三个类承担主要职责：  

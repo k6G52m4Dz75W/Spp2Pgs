@@ -12,11 +12,18 @@ offer to open one, so the examples here end in .sup. HD DVD also used .sup, for
 an unrelated format, which is the other reason to write "PGS sup" rather than a
 bare ".sup".
 
+The `Spp` in the name is `SubPicProvider`, the COM interface that the VSFilter
+family of renderers exposes. This tool does not parse .ass: it asks that
+interface for a bitmap at each moment in time and encodes what comes back. The
+name says subtitle provider to PG stream, not ASS to PGS.
+
 The project generates a command line application and a CLR dll file.  
 Core of them is a static library, libspp2pgs.
 
-An external dll, xy-VSSppf, is introduced to deal with subtitle files.  
-It's based on a forked version of xy-VSFilter, rendering and providing subtitles in a more easy way.  
+An external dll, xy-VSSppf, implements that interface. It is based on a forked
+version of xy-VSFilter and does the parsing and the rendering: given a moment in
+time, it returns a bitmap. It has to sit next to the exe, or encoding cannot
+start.  
 
 ## What's new
 
@@ -52,6 +59,12 @@ An executable converts subtitles to PGS sup files.
 Usage:  
 `Spp2Pgs -i "X:\Saya1011con.ass" -s 1080 -r 23 "X:\Saya1011con.sup"`  
 Option letters are case insensitive. Type Spp2Pgs -help for more help.
+
+Any text subtitle that xy-VSSppf can open is accepted. The format is decided by
+parsing the file, not by its extension. Verified: ASS and SSA, SRT, SAMI
+(`.smi`), MicroDVD (`.sub`), MPL2 (`.txt`) and RealText (`.rt`). VobSub needs a
+paired `.idx` and `.sub` and has not been tested. A `.sup` cannot be used as
+input: it is a graphics stream, not text.
 
 ## libspp2pgs & Spp2PgsNet*.dll
 The core and its CLR library wrapper for .NET framework applications.  
