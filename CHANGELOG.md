@@ -24,6 +24,7 @@ May 2016.
 - `build_sppf.bat` and `build_core.bat`, which build the whole thing with
   Visual Studio Build Tools. Output goes to `bin\`.
 - `README.zh.md` and `CHANGELOG.zh.md`, alongside the English originals.
+- The version appears on the first line of the help output.
 
 ### Changed
 - The version is defined in one place, `Version.h`, and read from there by the

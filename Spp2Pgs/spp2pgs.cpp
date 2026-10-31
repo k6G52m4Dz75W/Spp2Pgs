@@ -36,6 +36,7 @@
 #include "oledll.h"
 #include "S2PStdLogger.h"
 #include "S2PClaSettings.h"
+#include "../Version.h"
 
 using namespace spp2pgs;
 
@@ -120,7 +121,7 @@ static bool LooksLikeNumber(TCHAR const * s)
 void print_usage(S2PLogger const *logger)
 {
 	logger->Log(S2PLogger::error, _T(
-		"SPP2PGS - Convert a VSFilter subtitle to bluray PG stream.\n\n"
+		"SPP2PGS %d.%d.%d - Convert a VSFilter subtitle to bluray PG stream.\n\n"
 		"USAGE: Spp2Pgs -i \"input.ass\" -s 1080 -r 23 \"output.pgs\"\n"
 		"\t-i <filename>\n"
 		"\t\t Input subtitle file name. Use '-' for a stdin raw input. \n"
@@ -186,7 +187,7 @@ void print_usage(S2PLogger const *logger)
 		"\t\t as a 58%% grey; use the SDR output there instead.\n"
 		"\t<filename>\n"
 		"\t\t Output file name. Use '-' for a stdout output.\n\n"
-		));
+		), SPP2PGS_VERSION_MAJOR, SPP2PGS_VERSION_MINOR, SPP2PGS_VERSION_PATCH);
 }
 
 TCHAR const * TempOutputTypeName(TempOutputExceptionType type)

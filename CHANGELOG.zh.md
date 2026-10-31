@@ -20,6 +20,7 @@
 - `build_sppf.bat` 与 `build_core.bat`，用 Visual Studio Build Tools 完成全量编译，
   产物输出到 `bin\`。
 - `README.zh.md` 与 `CHANGELOG.zh.md`，与英文原版并列。
+- 帮助信息首行显示版本号。
 
 ### 变更
 - 版本号只在 `Version.h` 一处定义，三个资源脚本与 .NET 程序集信息均从那里读取。
