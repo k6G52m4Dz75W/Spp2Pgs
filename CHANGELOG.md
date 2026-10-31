@@ -37,6 +37,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bytes, but many tools pick files by extension and would not offer to open
   one. "PGS sup" names the format and the extension at once, which a bare
   ".sup" no longer does outside a Blu-ray context.
+- Both READMEs now list the subtitle formats that are known to work: ASS, SSA,
+  SRT, SAMI, MicroDVD, MPL2 and RealText. VobSub needs a paired `.idx` and
+  `.sub`, and a `.sup` is refused as input because it is a graphics stream, not
+  text. The rule that `xy-VSSppf*.dll` has to sit next to the exe, which is the
+  usual reason a first run fails, is stated there as well.
+- A Naming section at the end of both READMEs explains that `Spp` is
+  `SubPicProvider`, the COM interface that the VSFilter family of renderers
+  exposes, so the name reads as subtitle provider to PG stream rather than ASS
+  to PGS. The opening line is now the same sentence as the repository
+  description.
 - The version is defined in one place, `Version.h`, and read from there by the
   three resource scripts and by the .NET assembly info. Previously the values
   were typed into each file by hand and had drifted apart.
