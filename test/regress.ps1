@@ -16,8 +16,13 @@ foreach ($f in @($exe, $dll)) {
     if (-not (Test-Path $f)) { throw "missing $f" }
 }
 
-Remove-Item -Recurse -Force .tmp -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Path .tmp | Out-Null
+# Outputs live in their own subdirectory. Nothing is deleted up front: the
+# converter either writes the stream or reports failure, and every failure path
+# above throws before a hash is read, so a stale file can never be mistaken for
+# a fresh one. In particular .tmp itself is never cleared - it is shared with
+# ad-hoc work, and a recursive delete there once destroyed output still wanted.
+$work = '.tmp\regress'
+if (-not (Test-Path $work)) { New-Item -ItemType Directory -Path $work | Out-Null }
 
 function Convert-Sub {
     param([string]$In, [string]$Out, [string[]]$Extra = @())
@@ -53,23 +58,23 @@ function Get-Md5([string]$Path) {
 }
 
 Write-Host 'sdr, trailing line break'
-$frames = Convert-Sub -In 'test\solid.ass' -Out '.tmp\solid.sup'
+$frames = Convert-Sub -In 'test\solid.ass' -Out "$work\solid.sup"
 Write-Host "  frames: $frames"
 
 Write-Host 'sdr, no trailing line break'
-$framesNoEol = Convert-Sub -In 'test\solid-noeol.ass' -Out '.tmp\solid-noeol.sup'
+$framesNoEol = Convert-Sub -In 'test\solid-noeol.ass' -Out "$work\solid-noeol.sup"
 Write-Host "  frames: $framesNoEol"
 
 Write-Host 'hdr, trailing line break'
-$framesHdr = Convert-Sub -In 'test\solid.ass' -Out '.tmp\solid-hdr.sup' -Extra @('-h')
+$framesHdr = Convert-Sub -In 'test\solid.ass' -Out "$work\solid-hdr.sup" -Extra @('-h')
 Write-Host "  frames: $framesHdr"
 
-$sdr = Get-Md5 '.tmp\solid.sup'
-$noeol = Get-Md5 '.tmp\solid-noeol.sup'
-$hdr = Get-Md5 '.tmp\solid-hdr.sup'
-$size = (Get-Item '.tmp\solid.sup').Length
-$sizeNoEol = (Get-Item '.tmp\solid-noeol.sup').Length
-$sizeHdr = (Get-Item '.tmp\solid-hdr.sup').Length
+$sdr = Get-Md5 "$work\solid.sup"
+$noeol = Get-Md5 "$work\solid-noeol.sup"
+$hdr = Get-Md5 "$work\solid-hdr.sup"
+$size = (Get-Item "$work\solid.sup").Length
+$sizeNoEol = (Get-Item "$work\solid-noeol.sup").Length
+$sizeHdr = (Get-Item "$work\solid-hdr.sup").Length
 
 Write-Host ''
 Write-Host ("sdr   {0}  {1} bytes" -f $sdr, $size)
@@ -85,7 +90,7 @@ $failures = @()
 $saved = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
 try {
-    & $exe -i 'test\solid.ass' -s 9999 -r 23 '.tmp\useless.sup' 2>&1 | Out-Null
+    & $exe -i 'test\solid.ass' -s 9999 -r 23 "$work\useless.sup" 2>&1 | Out-Null
     $usageCode = $LASTEXITCODE
     & $exe -help 2>&1 | Out-Null
     $helpCode = $LASTEXITCODE
