@@ -1,5 +1,7 @@
 # Spp2Pgs
 
+[![build](https://github.com/k6G52m4Dz75W/Spp2Pgs/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/k6G52m4Dz75W/Spp2Pgs/actions/workflows/build.yml)
+
 [English](README.md) | [简体中文](README.zh.md)
 
 Convert ASS/SSA, SRT, SAMI and DVD subtitles to Blu-ray PGS sup files with

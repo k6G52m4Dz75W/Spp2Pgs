@@ -6,6 +6,19 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.10.3] - 2026-10-31
+
+### 新增
+- 两份 README 顶部各加一个构建徽章，点击跳到工作流页面。
+
+### 变更
+- 工作流在每次推送到 `main` 时也会运行，不再只在推 tag 时运行。此前编译坏掉
+  可能一直留在树里，直到有人想起来手动触发一次；现在一次推送就会自行编译两个
+  二进制并跑回归样例。推 tag 仍会继续创建 draft release。
+- `.gitattributes` 把 `.github/workflows/*.yml` 与它本身钉为 LF。此前在
+  `core.autocrlf` 下两者以 LF 存、以 CRLF 检出，导致每次检出都显示被修改、
+  每次 add 都输出一条警告。
+
 ## [0.10.2] - 2026-10-31
 
 ### 变更
@@ -97,6 +110,7 @@
 本记录从 0.10.0 开始。此前的版本由上游
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs) 发布，最后一个为 2016 年 5 月的 0.9.3.7。
 
+[0.10.3]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.3
 [0.10.2]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.2
 [0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0

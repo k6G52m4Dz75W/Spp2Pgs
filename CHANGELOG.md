@@ -6,6 +6,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.3] - 2026-10-31
+
+### Added
+- A build badge at the top of both READMEs, linking to the workflow.
+
+### Changed
+- The workflow runs on every push to `main`, not only when a tag is pushed. A
+  broken build could previously sit in the tree until someone remembered to
+  start a run by hand; a push now builds both binaries and runs the regression
+  samples on its own. A tag still carries on to the draft release.
+- `.gitattributes` pins `.github/workflows/*.yml` and itself to LF. Stored with
+  LF and checked out with CRLF under `core.autocrlf`, the two were reported as
+  modified after every checkout and drew a warning on every add.
+
 ## [0.10.2] - 2026-10-31
 
 ### Changed
@@ -129,6 +143,7 @@ This changelog begins at 0.10.0. Earlier releases were published upstream at
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs), the last of them 0.9.3.7 in
 May 2016.
 
+[0.10.3]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.3
 [0.10.2]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.2
 [0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0

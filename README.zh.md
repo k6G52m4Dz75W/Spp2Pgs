@@ -1,5 +1,7 @@
 # Spp2Pgs
 
+[![build](https://github.com/k6G52m4Dz75W/Spp2Pgs/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/k6G52m4Dz75W/Spp2Pgs/actions/workflows/build.yml)
+
 [English](README.md) | [简体中文](README.zh.md)
 
 把 ASS/SSA、SRT、SAMI 与 DVD 字幕转换为蓝光 PGS sup 文件，可选输出
