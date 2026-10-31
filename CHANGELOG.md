@@ -23,10 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The renderer now honours `LayoutResX` / `LayoutResY`. These headers were
   previously skipped as unrecognised lines. When a script declares them it is
   rasterised at that resolution and scaled up to the output canvas: font size,
-  position and line breaking are unchanged, edges are slightly softer and the
-  `.sup` grows by roughly 5-6%. If `LayoutRes` equals the output resolution the
-  output is byte-identical, and without the headers nothing differs from 0.10.1.
-  See "Script resolution and LayoutRes" in the README.
+  position and line breaking are unchanged, glyph and border outlines keep their
+  size while the antialiasing gradient widens, and the `.sup` grows by roughly
+  5-6%. If `LayoutRes` equals the output canvas, or neither header is present,
+  the output is byte-identical to 0.10.1. See "PlayRes and LayoutRes" in the
+  README.
 - The workflow runs on every push to `main`, not only when a tag is pushed. A
   broken build could previously sit in the tree until someone remembered to
   start a run by hand; a push now builds both binaries and runs the regression

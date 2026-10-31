@@ -25,9 +25,10 @@ start.
   output is unaffected.
 - **`LayoutResX` / `LayoutResY` are honoured.** A script that declares them is
   rasterised at that resolution and scaled up to the output canvas: font size,
-  position and line breaking are unchanged, edges are slightly softer and the
-  `.sup` grows by roughly 5-6%. Without them the output is byte-identical to
-  0.10.1. See "Script resolution and LayoutRes" below.
+  position and line breaking are unchanged, glyph and border outlines keep their
+  size while the antialiasing gradient widens, and the `.sup` grows by roughly
+  5-6%. Without them the output is byte-identical to 0.10.1. See "PlayRes and
+  LayoutRes" below.
 - **Full rebuilds.** `build_sppf.bat rebuild` runs `/t:Rebuild` and logs
   separately from the incremental build, so the warning counts of the two can be
   compared directly.
@@ -142,41 +143,74 @@ original disc played as an ISO too. A correct HDR pipeline renders the 143 of
 203 nits. If the HDR variant looks darker than the SDR one, the player is
 skipping PQ for PG streams -- use the SDR output until it does.
 
-## Script resolution and LayoutRes
-Two resolutions are involved and are easy to confuse:
+## PlayRes and LayoutRes
 
-- The **output canvas** is set by `-s`, where `-s 1080p` means 1920x1080. There
-  is no default; it has to be given.
-- The **script coordinate system** is set by `PlayResX` / `PlayResY` in the
-  subtitle. **When they are absent it is 384x288.**
+Three sizes are involved, from three different sources:
 
-Font size is scaled by the output height over `PlayResY`, which is 3.75 at
-1080p: a size 14 script lands at 52.5 px on screen, and `MarginV` scales the
-same way. Writing the target resolution into `PlayResX` / `PlayResY` makes the
-font size the final pixel size, with no arithmetic to do:
+| Name | Source | Default | Role |
+|---|---|---|---|
+| Output canvas | the `-s` option | none; the run fails without it | final size of the PGS image, and the scaling target of the other two |
+| Script coordinate system `PlayRes` | `PlayResX` / `PlayResY` headers | 384x288 | basis for font size, margins and alignment |
+| Rasterisation base `LayoutRes` | `LayoutResX` / `LayoutResY` headers | the output canvas | basis for `\be`, `\blur`, `\frx`, `\fry`, border and shadow |
 
-```
-PlayResX: 1920
-PlayResY: 1080
-```
+`PlayRes` and `LayoutRes` are independent: the first defines the coordinate
+system, the second the rasterisation size.
 
-With `ScaledBorderAndShadow: yes`, the outline is scaled horizontally by the
-output width over `PlayResX` and vertically by the output height over
-`PlayResY`. The two agree only when the aspect ratio of `PlayRes` matches that
-of the picture; the absent default of 384x288 is 4:3, so against a 16:9 picture
-the horizontal border is 4/3 thicker than the vertical one. Give `PlayRes` the
-same ratio as the picture and the two agree, at which point the switch changes
-nothing. Without the switch, the `Outline` and `Shadow` numbers are final
-pixels.
+### PlayRes
 
-`LayoutResX` / `LayoutResY` exist so that one script can serve several
-resolutions: when both are present and greater than 0, the frame is rasterised
-at that size and scaled up to the output canvas. Font size, position and line
-breaking are unchanged, edges are slightly softer and the `.sup` grows by
-roughly 5-6%. Border and shadow follow that value only when
-`ScaledBorderAndShadow` is not `yes`. The output canvas of this tool is fixed,
-so the feature has nothing to offer here and **is best left out**; when a
-subtitle arrives with it, deleting the two lines restores the 0.10.1 behaviour.
+With k = output height / `PlayResY`,
+
+    font size (px) = Fontsize * k
+    margin    (px) = MarginV  * k
+
+`PlayRes` defaults to 384x288, so k = 1080 / 288 = 3.75 at a 1080p output and
+`Fontsize: 14` is rendered at 52.5 px. Write the target resolution into `PlayRes`
+and k = 1, so the numbers are pixels:
+
+    PlayResX: 1920
+    PlayResY: 1080
+
+If only one of the two is given, the other follows a 4:3 ratio: `PlayResX: 1280`
+corresponds to `PlayResY: 1024`, otherwise multiply by 3/4 or 4/3.
+
+With `ScaledBorderAndShadow: yes`, border and shadow are scaled along each axis
+separately:
+
+    border (horizontal) = Outline * (output width  / PlayResX)
+    border (vertical)   = Outline * (output height / PlayResY)
+    shadow (horizontal) = Shadow  * (output width  / PlayResX)
+    shadow (vertical)   = Shadow  * (output height / PlayResY)
+
+Their ratio is (output width / output height) / (PlayResX / PlayResY), that is
+picture aspect ratio / `PlayRes` aspect ratio, and is 1 only when the two match.
+The 384x288 default is 4:3, so against a 16:9 picture the ratio is 4/3.
+
+Without `ScaledBorderAndShadow`, `Outline` and `Shadow` are pixels and are not
+scaled.
+
+### LayoutRes
+
+`LayoutResX` / `LayoutResY` define the rasterisation size. They take effect when
+both are present and greater than 0: the frame is rasterised at that size and
+scaled up to the output canvas.
+
+- font size, position, line breaking: unchanged
+- border and shadow: unchanged when `ScaledBorderAndShadow` is `yes`, otherwise
+  scaled with `LayoutRes`
+- glyph and border edges: outlines keep their size, the antialiasing gradient
+  widens with the upscale
+- `.sup` size: roughly 5-6% larger
+
+When `LayoutRes` equals the output canvas, or neither header is present, the
+output is byte-identical to 0.10.1.
+
+The two headers are not ignored: they declare the rasterisation base the author
+chose, and ignoring them would depart from what the file says. The output canvas
+of this tool is fixed and needs no reuse across resolutions, so a script written
+for this tool needs neither header; a script that carries them normally comes
+from another tool, and rendering it as declared matches what the author saw.
+0.10.1 does not recognise them and always rasterises at the output canvas, so
+remove the two lines when the old output is wanted.
 
 ## Building
 Two scripts in the repository root, run in this order:
