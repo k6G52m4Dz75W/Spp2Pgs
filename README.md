@@ -166,35 +166,31 @@ requires is fixed at 0. Released versions are listed in
 [releases page](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases).
 
 ## Naming
-`Spp` is `SubPicProvider`, the COM interface that the VSFilter family of
-renderers exposes. This tool does not parse .ass: it asks that interface for a
-bitmap at each moment in time and encodes what comes back. The name says
-subtitle provider to PG stream, not ASS to PGS.
+`Spp` stands for `SubPicProvider`, the COM interface exposed by the VSFilter
+renderers. The tool obtains bitmaps through that interface instead of parsing
+subtitle files itself, so the name refers to the input interface rather than to
+a subtitle format.
 
-The output is a "PGS sup": PGS is the format, an HDMV PG stream, and .sup is the
-extension such a file is normally given. They are one stream -- a .pgs file
-holds the same bytes -- but many tools pick files by extension and will not
-offer to open one, so the examples here end in .sup. HD DVD also used .sup, for
-an unrelated format, which is the reason to write "PGS sup" rather than a bare
-".sup".
+The output is referred to as a "PGS sup": PGS is the format, an HDMV PG stream,
+and `.sup` is its customary extension. A `.pgs` file contains the same bytes,
+but many tools select files by extension, so the examples use `.sup`. HD DVD
+used `.sup` for a different format, which is why the format is stated explicitly.
 
 ## Special Thanks
 * This projects starts on basis of [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/)
 * xy-VSSppf is a forked version of [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter)
 
 ## License
-Spp2Pgs is free software under the GNU General Public License, version 3 or
-later: see [License.txt](License.txt). Copyright (C) 2016 Giton Xu; the changes
-made in this fork are under the same license.
+Spp2Pgs is distributed under the GNU General Public License, version 3 or
+later; see [License.txt](License.txt). Copyright (C) 2016 Giton Xu. Changes made
+in this fork are under the same license.
 
 `xy-VSSppf` is built from
-[xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter), which is under GPL
-version 2 or later -- its source files say "either version 2 of the License, or
-(at your option) any later version". Version 2 or later can be used under
-version 3, so the two are compatible and the whole is conveyed under GPLv3. The
-terms of that part are in [License.txt](misc/xy-VSFilter/src/License.txt) and
-travel with the binary as `xy-VSFilter-license.txt`.
+[xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter), which is licensed under
+GPL version 2 or later. That version permits use under GPL version 3, so the
+combination is distributed as GPLv3. Its terms are in
+[License.txt](misc/xy-VSFilter/src/License.txt), shipped with the binary as
+`xy-VSFilter-license.txt`.
 
-A binary is only half of what the license asks for. GitHub's own source archives
-leave submodules out, so a release here also carries a source archive with the
-xy-VSFilter tree inside it.
+Releases include a source archive containing the xy-VSFilter tree, which the
+archives GitHub generates omit.

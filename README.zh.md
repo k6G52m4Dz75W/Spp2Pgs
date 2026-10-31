@@ -138,29 +138,24 @@ git submodule update --init --recursive
 [发布页](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases)。
 
 ## 命名
-名字里的 `Spp` 是 `SubPicProvider` 的缩写，指 VSFilter 一系渲染器对外提供的 COM 接口。
-本工具不解析 .ass，它按时间从该接口取位图，再把位图编码成 PG 流，所以这个名字说的是
-「从字幕提供器到 PG 流」，而不是「从 ASS 到 PGS」。
+`Spp` 是 `SubPicProvider` 的缩写，即 VSFilter 一系渲染器提供的 COM 接口。本工具通过
+该接口取得位图，不自行解析字幕文件，因此名字指向输入接口，而不是某种字幕格式。
 
-输出文件称为「PGS sup」：PGS 是格式（HDMV PG 流），.sup 是这类文件通常使用的后缀。
-两者是同一份流，.pgs 文件的字节完全相同，但很多工具按后缀挑选文件，不会把它列进
-可打开的清单里，所以本文的示例一律写 .sup。HD DVD 当年也用 .sup，装的却是另一种
-格式，这是应该写「PGS sup」而不是光写「.sup」的理由。
+输出文件称为「PGS sup」：PGS 是格式（HDMV PG 流），`.sup` 是惯用后缀。`.pgs` 文件
+字节相同，但许多工具按后缀筛选文件，故示例统一使用 `.sup`。HD DVD 曾把 `.sup` 用于
+另一种格式，故名称中显式写出格式。
 
 ## 特别致谢
 * 本项目基于 [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/) 起步
 * xy-VSSppf 是 [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter) 的一个分叉版本
 
 ## 许可证
-Spp2Pgs 是自由软件，以 GNU 通用公共许可证第 3 版或其后续版本发布，见
-[License.txt](License.txt)。版权归 Giton Xu（2016）；本分叉所做的修改沿用同一许可证。
+Spp2Pgs 以 GNU 通用公共许可证第 3 版或其后续版本分发，见
+[License.txt](License.txt)。版权归 Giton Xu（2016）。本分叉所做的修改沿用同一许可证。
 
-`xy-VSSppf` 由 [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter) 编译而来，
-后者以 GPL 第 2 版或其后续版本发布 —— 其源文件声明 "either version 2 of the
-License, or (at your option) any later version"。第 2 版或其后续版本可以按第 3 版
-使用，因此二者兼容，整体以 GPLv3 分发。该部分自身的条款见
-[License.txt](misc/xy-VSFilter/src/License.txt)，并随二进制一同提供为
+`xy-VSSppf` 由 [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter) 编译，后者以
+GPL 第 2 版或其后续版本授权。该版本允许按第 3 版使用，故整体以 GPLv3 分发。该部分
+的条款见 [License.txt](misc/xy-VSFilter/src/License.txt)，随二进制提供为
 `xy-VSFilter-license.txt`。
 
-只有二进制并不满足许可证的要求：GitHub 自动生成的源码归档不含子模块，因此这里的
-每次发布都另附一份包含 xy-VSFilter 源码树的归档。
+发布包另附一份源码归档，包含 xy-VSFilter 源码树 —— GitHub 自动生成的归档不含该部分。
