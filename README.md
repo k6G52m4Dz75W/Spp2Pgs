@@ -31,6 +31,8 @@ It's based on a forked version of xy-VSFilter, rendering and providing subtitles
 - **It builds again.** `build_sppf.bat` and `build_core.bat` drive Visual
   Studio 2026 (v145) and SDK 10.0.26100; the toolset v100/v140 that the
   solutions themselves reference can no longer be installed.
+- **64-bit only.** The 32-bit build and the .NET wrapper are no longer produced:
+  the configurations are still in the project files, but no build emits them.
 - **Option letters are case insensitive**, and help moved to `-help` so that
   `-h` could become the HDR switch. `-H203` still works.
 

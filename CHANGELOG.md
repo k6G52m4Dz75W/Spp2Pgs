@@ -44,6 +44,16 @@ May 2016.
 - The xy-VSFilter submodule points at a fork maintained here, so that the fixes
   below can be carried.
 
+### Removed
+- The 32-bit build. Both scripts build `Platform=x64`, so the results are
+  `Spp2Pgs64.exe` and `xy-VSSppf64.dll` only. The Win32 configurations are still
+  in the project files -- no source was deleted -- but nothing produces them,
+  and the 2016 archives shipped Win32 and Win64 binaries side by side.
+- The .NET wrapper. `Spp2PgsNet.vcxproj` still references `libspp2pgs` and its
+  `AssemblyInfo.cpp` follows `Version.h`, but no build here produces the dll, so
+  it has not been compiled or tested against this toolset. The Pes2Pgs and
+  Pgs2Pes tools that came in the 2016 archives are not in this repository at all.
+
 ### Fixed
 - A subtitle whose last line has no trailing line break is no longer dropped.
   Depending on the timing, the line either disappeared entirely or lost its
@@ -59,7 +69,5 @@ May 2016.
   a failed input open. A missing xy-VSSppf DLL is told apart from an empty or
   unreadable subtitle file, a wrong-bitness DLL is named as such, and running
   out of memory is reported as such rather than as an unknown exception.
-
-## Links
 
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0
