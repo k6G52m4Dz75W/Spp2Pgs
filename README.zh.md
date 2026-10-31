@@ -2,12 +2,13 @@
 
 [English](README.md) | [简体中文](README.zh.md)
 
-把普通字幕转换为 HDMV PG 流，保存为 PGS sup 文件：输入 .ass，输出 .sup。
+把 ASS/SSA、SRT、SAMI 与 DVD 字幕转换为蓝光 PGS sup 文件，可选输出
+HDR（BT.2020 ST 2084）调色板。
 
-「PGS sup」把格式和后缀一起说清：PGS 是格式，.sup 是这类文件通常使用的后缀。
-两者是同一份流，.pgs 文件的字节完全相同，但很多工具按后缀挑选文件，不会把它
-列进可打开的清单里，所以本文的示例一律写 .sup。HD DVD 当年也用 .sup，装的却是
-另一种格式，这是应该写「PGS sup」而不是光写「.sup」的另一个理由。
+「PGS sup」把格式和后缀一起说清：PGS 是格式（HDMV PG 流），.sup 是这类文件通常
+使用的后缀。两者是同一份流，.pgs 文件的字节完全相同，但很多工具按后缀挑选文件，
+不会把它列进可打开的清单里，所以本文的示例一律写 .sup。HD DVD 当年也用 .sup，
+装的却是另一种格式，这是应该写「PGS sup」而不是光写「.sup」的另一个理由。
 
 名字里的 `Spp` 是 `SubPicProvider` 的缩写，指 VSFilter 一系渲染器对外提供的 COM 接口。
 本工具不解析 .ass，它按时间从该接口取位图，再把位图编码成 PG 流，所以这个名字说的是

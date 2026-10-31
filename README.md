@@ -2,15 +2,15 @@
 
 [English](README.md) | [简体中文](README.zh.md)
 
-Converts general subtitles to HDMV PG streams, saved as PGS sup files: .ass
-in, .sup out.
+Convert ASS/SSA, SRT, SAMI and DVD subtitles to Blu-ray PGS sup files with
+optional HDR (BT.2020 ST 2084) palette support.
 
-The phrase names the format and the extension at once: PGS is the format, .sup
-is the extension such a file is normally given. They are one stream -- a .pgs
-file holds the same bytes -- but many tools pick files by extension and will not
-offer to open one, so the examples here end in .sup. HD DVD also used .sup, for
-an unrelated format, which is the other reason to write "PGS sup" rather than a
-bare ".sup".
+The phrase "PGS sup" names the format and the extension at once: PGS is the
+format -- an HDMV PG stream -- and .sup is the extension such a file is normally
+given. They are one stream -- a .pgs file holds the same bytes -- but many tools
+pick files by extension and will not offer to open one, so the examples here end
+in .sup. HD DVD also used .sup, for an unrelated format, which is the other
+reason to write "PGS sup" rather than a bare ".sup".
 
 The `Spp` in the name is `SubPicProvider`, the COM interface that the VSFilter
 family of renderers exposes. This tool does not parse .ass: it asks that
