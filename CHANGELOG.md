@@ -16,9 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A build badge at the top of both READMEs, linking to the workflow.
 
 ### Changed
-- Merged xy-VSFilter upstream `532b756` (2023-02), which replaces the renderer.
-  Everything merged is player-side behaviour except the entry below; the PGS
-  output of this tool is unaffected.
+- xy-VSFilter is brought up to the latest upstream commit, `532b756` (2023-02);
+  the fork had been based on the upstream state of 2015-10. Everything merged is
+  player-side behaviour except the entry below; the PGS output of this tool is
+  unaffected.
 - The renderer now honours `LayoutResX` / `LayoutResY`. These headers were
   previously skipped as unrecognised lines. When a script declares them it is
   rasterised at that resolution and scaled up to the output canvas: font size,

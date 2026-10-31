@@ -19,8 +19,10 @@ start.
 
 **0.11.0** — 2026-10-31 · [full changelog](CHANGELOG.md) · [release](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.11.0)
 
-- **A new renderer.** Merged xy-VSFilter upstream from 2023-02. Everything merged
-  is player-side behaviour except the entry below; the PGS output is unaffected.
+- **A new renderer.** xy-VSFilter is brought up to the latest upstream commit,
+  `532b756` (2023-02); the fork had been based on the upstream state of 2015-10.
+  Everything merged is player-side behaviour except the entry below; the PGS
+  output is unaffected.
 - **`LayoutResX` / `LayoutResY` are honoured.** A script that declares them is
   rasterised at that resolution and scaled up to the output canvas: font size,
   position and line breaking are unchanged, edges are slightly softer and the
