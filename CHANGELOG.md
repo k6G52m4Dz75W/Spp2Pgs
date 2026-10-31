@@ -14,15 +14,17 @@ May 2016.
 
 ### Added
 - `-h[<nits>]` writes an HDR palette, BT.2020 with the ST 2084 (PQ) transfer
-  function, for pairing with HDR video. Without it the output stays BT.709 SDR
-  and is byte for byte what earlier versions produced.
+  function, for pairing with HDR video. Without it the output stays BT.709 SDR,
+  and none of the existing palette path is touched.
   - The value is the luminance that white maps to. It is optional and may be
     attached or separated, so `-h`, `-hdr`, `-h203` and `-h 203` all produce the
     same stream. A non-numeric suffix is reported rather than silently ignored.
   - Default 203 nits, the graphics white of ITU-R BT.2408. Values above 500 nits
     are clamped, with a warning.
 - `build_sppf.bat` and `build_core.bat`, which build the whole thing with
-  Visual Studio Build Tools. Output goes to `bin\`.
+  Visual Studio Build Tools and drop the results in `bin\`. The solutions in the
+  repository reference toolset v100/v140 and Windows SDK 8.1, none of which can
+  be installed any more.
 - `README.zh.md` and `CHANGELOG.zh.md`, alongside the English originals.
 - The version appears on the first line of the help output.
 
@@ -45,6 +47,9 @@ May 2016.
   Depending on the timing, the line either disappeared entirely or lost its
   picture while the text survived.
 - A pointer truncation in the x64 rasterizer, inherited from upstream.
+- Temporary cache space is estimated from the video duration instead of
+  reserving a fixed 4 GiB, and a disk failure reports its real error code rather
+  than "code 0".
 
 ## Links
 

@@ -69,7 +69,7 @@ thing that tells a player how to read it. That is why one .ass file still needs
 two different .sup files if it has to serve both SDR and HDR video.
 
 `-h` writes the BT.2020 ST 2084 (PQ) variant. Without it the output stays
-BT.709 SDR, byte for byte as before.
+BT.709 SDR.
 
 `-h[<nits>]` sets the luminance that RGB white maps to. The value is optional
 and may be attached or separated, so `-h`, `-hdr`, `-h203` and `-h 203` all
