@@ -243,7 +243,7 @@ void print_usage(S2PLogger const *logger)
 		"\t<filename>\n"
 		"\t\t Output file name. Use '-' for a stdout output.\n\n"
 		"Exit status: 0 the file was written, 1 the command line was wrong,\n"
-		"\t 2 the conversion failed, 3 an unexpected error.\n\n"
+		"\t 2 the conversion failed, 3 an unhandled exception.\n\n"
 		), SPP2PGS_VERSION_MAJOR, SPP2PGS_VERSION_MINOR, SPP2PGS_VERSION_PATCH);
 }
 

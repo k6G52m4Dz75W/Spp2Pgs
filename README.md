@@ -38,8 +38,8 @@ start.
 - **Option letters are case insensitive**, and help moved to `-help` so that
   `-h` could become the HDR switch. `-H203` still works.
 - **The exit status means something.** 0 is a written file, 1 a bad command
-  line, 2 a failed conversion, 3 an exception. A run that worked used to exit
-  with 1, the same code a mistyped command line gave.
+  line, 2 a failed conversion, 3 an unhandled exception. A run that worked used
+  to exit with 1, the same code a mistyped command line gave.
 - **Builds run on GitHub Actions**, which compiles both binaries from the tagged
   source and runs a regression check on them, instead of taking an upload.
 
