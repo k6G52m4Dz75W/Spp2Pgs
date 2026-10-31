@@ -158,8 +158,10 @@ static bool NormaliseCommandLine(int argc, _TCHAR * argv[])
 void print_usage(S2PLogger const *logger)
 {
 	logger->Log(S2PLogger::error, _T(
-		"SPP2PGS %d.%d.%d - Convert a VSFilter subtitle to bluray PG stream.\n\n"
-		"USAGE: Spp2Pgs -i \"input.ass\" -s 1080 -r 23 \"output.pgs\"\n"
+		"SPP2PGS %d.%d.%d - Convert a VSFilter subtitle to a PGS sup file.\n\n"
+		"USAGE: Spp2Pgs -i \"input.ass\" -s 1080 -r 23 \"output.sup\"\n"
+		"\t\t A PGS sup is an HDMV PG stream. A .pgs file holds the same bytes,\n"
+		"\t\t but many tools pick files by extension, so .sup is what to use.\n"
 		"\t-help\n"
 		"\t\t Print this text. Spelled out in full because -h is the HDR switch;\n"
 		"\t\t every option letter is matched regardless of case.\n"

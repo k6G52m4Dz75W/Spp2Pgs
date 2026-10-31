@@ -2,8 +2,12 @@
 
 [English](README.md) | [简体中文](README.zh.md)
 
-把普通字幕转换为 HDMV PG 流。  
-换句话说，把 .ass 文件转换为 .sup 文件。
+把普通字幕转换为 HDMV PG 流，保存为 PGS sup 文件：输入 .ass，输出 .sup。
+
+「PGS sup」同时说清了两半。PGS 是格式，.sup 是这类文件通常使用的后缀。两者是
+同一份流：.pgs 文件字节完全相同，但很多工具按后缀挑选文件，不会把它列进可打开
+的清单里，所以本文的示例一律写 .sup。HD DVD 当年用 .sup 装的是另一种格式，
+这也是应该写「PGS sup」而不是光写「.sup」的另一个理由。
 
 本项目产出一个命令行程序和一个 CLR 动态库，两者的核心是一个静态库 libspp2pgs。
 
@@ -33,7 +37,7 @@
 下面分别说明这四个部分。
 
 ## Spp2Pgs*.exe
-把字幕转换为 .sup 文件的可执行程序。  
+把字幕转换为 PGS sup 文件的可执行程序。  
 用法：  
 `Spp2Pgs -i "X:\Saya1011con.ass" -s 1080 -r 23 "X:\Saya1011con.sup"`  
 选项字母不区分大小写。执行 `Spp2Pgs -help` 可查看完整帮助。

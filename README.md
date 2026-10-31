@@ -2,8 +2,14 @@
 
 [English](README.md) | [简体中文](README.zh.md)
 
-Converts general subtitles to HDMV PG streams.  
-In other words, converts .ass files to .sup files.
+Converts general subtitles to HDMV PG streams, saved as PGS sup files: .ass
+in, .sup out.
+
+"PGS sup" names both halves. PGS is the format, .sup is the extension such a
+file is normally given. They are one stream: a .pgs file holds the same bytes,
+but many tools pick files by extension and will not offer to open one, so the
+examples here end in .sup. HD DVD used .sup for an unrelated format, which is
+the other reason to say "PGS sup" rather than a bare ".sup".
 
 The project generates a command line application and a CLR dll file.  
 Core of them is a static library, libspp2pgs.
@@ -41,7 +47,7 @@ That is the headline only; [`CHANGELOG.md`](CHANGELOG.md) has every entry.
 Here is a brief description for all the four parts.
 
 ## Spp2Pgs*.exe
-An executable converts subtitles to .sup files.  
+An executable converts subtitles to PGS sup files.  
 Usage:  
 `Spp2Pgs -i "X:\Saya1011con.ass" -s 1080 -r 23 "X:\Saya1011con.sup"`  
 Option letters are case insensitive. Type Spp2Pgs -help for more help.

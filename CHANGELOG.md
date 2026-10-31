@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so `-H203` still works and `-S 1080` means the same as `-s 1080`. Previously
   `-h` and `-H` were two different options, which is a fragile thing to ask of a
   case insensitive command line.
+- The output is described as a PGS sup throughout, and the help text and every
+  example say `.sup` rather than `.pgs`. A `.pgs` file holds exactly the same
+  bytes, but many tools pick files by extension and would not offer to open
+  one. "PGS sup" names the format and the extension at once, which a bare
+  ".sup" no longer does outside a Blu-ray context.
 - The version is defined in one place, `Version.h`, and read from there by the
   three resource scripts and by the .NET assembly info. Previously the values
   were typed into each file by hand and had drifted apart.
