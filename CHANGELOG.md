@@ -47,6 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   exposes, so the name reads as subtitle provider to PG stream rather than ASS
   to PGS. The opening line is now the same sentence as the repository
   description.
+- Both READMEs now state the license. Spp2Pgs is GPL version 3 or later; the
+  bundled xy-VSFilter is GPL version 2 or later, which may be used under
+  version 3, so the two halves link into one binary lawfully. They also say that
+  a release carries its own source archive: GitHub's source archives leave
+  submodules out, and the dll is compiled from that submodule.
 - The version is defined in one place, `Version.h`, and read from there by the
   three resource scripts and by the .NET assembly info. Previously the values
   were typed into each file by hand and had drifted apart.
