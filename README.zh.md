@@ -150,3 +150,17 @@ git submodule update --init --recursive
 ## 特别致谢
 * 本项目基于 [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/) 起步
 * xy-VSSppf 是 [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter) 的一个分叉版本
+
+## 许可证
+Spp2Pgs 是自由软件，以 GNU 通用公共许可证第 3 版或其后续版本发布，见
+[License.txt](License.txt)。版权归 Giton Xu（2016）；本分叉所做的修改沿用同一许可证。
+
+`xy-VSSppf` 由 [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter) 编译而来，
+后者以 GPL 第 2 版或其后续版本发布 —— 其源文件声明 "either version 2 of the
+License, or (at your option) any later version"。第 2 版或其后续版本可以按第 3 版
+使用，因此二者兼容，整体以 GPLv3 分发。该部分自身的条款见
+[License.txt](misc/xy-VSFilter/src/License.txt)，并随二进制一同提供为
+`xy-VSFilter-license.txt`。
+
+只有二进制并不满足许可证的要求：GitHub 自动生成的源码归档不含子模块，因此这里的
+每次发布都另附一份包含 xy-VSFilter 源码树的归档。

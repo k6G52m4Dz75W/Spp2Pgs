@@ -181,3 +181,20 @@ an unrelated format, which is the reason to write "PGS sup" rather than a bare
 ## Special Thanks
 * This projects starts on basis of [avs2bdnxml](http://www.ps-auxw.de/avs2bdnxml/)
 * xy-VSSppf is a forked version of [xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter)
+
+## License
+Spp2Pgs is free software under the GNU General Public License, version 3 or
+later: see [License.txt](License.txt). Copyright (C) 2016 Giton Xu; the changes
+made in this fork are under the same license.
+
+`xy-VSSppf` is built from
+[xy-VSFilter](https://github.com/Cyberbeing/xy-VSFilter), which is under GPL
+version 2 or later -- its source files say "either version 2 of the License, or
+(at your option) any later version". Version 2 or later can be used under
+version 3, so the two are compatible and the whole is conveyed under GPLv3. The
+terms of that part are in [License.txt](misc/xy-VSFilter/src/License.txt) and
+travel with the binary as `xy-VSFilter-license.txt`.
+
+A binary is only half of what the license asks for. GitHub's own source archives
+leave submodules out, so a release here also carries a source archive with the
+xy-VSFilter tree inside it.
