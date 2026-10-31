@@ -2,6 +2,10 @@
 SETLOCAL
 SET "ROOT=%~dp0"
 SET "EXITCODE=0"
+SET "TARGET=Build"
+SET "LOGNAME=build_sppf.log"
+IF /I "%~1"=="rebuild" SET "TARGET=Rebuild"
+IF /I "%~1"=="rebuild" SET "LOGNAME=build_sppf_rebuild.log"
 SET "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 SET "VSDIR="
 IF EXIST "%VSWHERE%" FOR /F "USEBACKQ TOKENS=*" %%I IN (`"%VSWHERE%" -latest -prerelease -products * -requires Microsoft.Component.MSBuild -property installationPath`) DO SET "VSDIR=%%I"
@@ -11,7 +15,7 @@ SET "VSDIR=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools"
 :HaveVS
 SET "MSB=%VSDIR%\MSBuild\Current\Bin\MSBuild.exe"
 SET "YASMDIR=%TEMP%\spp2pgs_yasm"
-SET "LOG=%ROOT%build_sppf.log"
+SET "LOG=%ROOT%%LOGNAME%"
 SET "SRC=%ROOT%misc\xy-VSFilter\src"
 SET "SLNOUT=%SRC%\bin\lib_18.0\x64\Release"
 SET "SDK=10.0.26100.0"
@@ -38,9 +42,10 @@ SET "VSLANG=1033"
 ECHO Visual Studio: %VSDIR%
 ECHO Building VSFilter.sln (Release x64, toolset v145, SDK %SDK%)
 ECHO Then copying VSSppf.dll to bin as xy-VSSppf64.dll
+ECHO Target: %TARGET%, log: %LOGNAME%
 ECHO This build is much heavier than the core one, please wait ...
 ECHO.
-"%MSB%" "%SRC%\VSFilter.sln" /nologo /m /t:Build /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v145 /p:VisualStudioVersion=18.0 /p:WindowsTargetPlatformVersion=%SDK% /verbosity:minimal "/flp:LogFile=%LOG%;Encoding=UTF-8;Verbosity=minimal"
+"%MSB%" "%SRC%\VSFilter.sln" /nologo /m /t:%TARGET% /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v145 /p:VisualStudioVersion=18.0 /p:WindowsTargetPlatformVersion=%SDK% /verbosity:minimal "/flp:LogFile=%LOG%;Encoding=UTF-8;Verbosity=minimal"
 SET "RC=%ERRORLEVEL%"
 ECHO.
 IF NOT "%RC%"=="0" GOTO Failed
