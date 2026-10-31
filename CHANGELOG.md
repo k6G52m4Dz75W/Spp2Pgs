@@ -6,10 +6,6 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-This changelog begins at 0.10.0. Earlier releases were published upstream at
-[subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs), the last of them 0.9.3.7 in
-May 2016.
-
 ## [0.10.0] - 2026-10-31
 
 ### Added
@@ -69,5 +65,9 @@ May 2016.
   a failed input open. A missing xy-VSSppf DLL is told apart from an empty or
   unreadable subtitle file, a wrong-bitness DLL is named as such, and running
   out of memory is reported as such rather than as an unknown exception.
+
+This changelog begins at 0.10.0. Earlier releases were published upstream at
+[subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs), the last of them 0.9.3.7 in
+May 2016.
 
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0

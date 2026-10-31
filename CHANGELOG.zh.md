@@ -6,9 +6,6 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-本记录从 0.10.0 开始。此前的版本由上游
-[subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs) 发布，最后一个为 2016 年 5 月的 0.9.3.7。
-
 ## [0.10.0] - 2026-10-31
 
 ### 新增
@@ -51,5 +48,8 @@
   可用空间与所需空间、Windows 错误码及通俗提示，以及输入流打开失败的 HRESULT。
   xy-VSSppf DLL 缺失时不再与「字幕文件为空或不可读」混为一谈，位数不符的 DLL
   会被指明，内存不足也会如实报告，而不是归入未知异常。
+
+本记录从 0.10.0 开始。此前的版本由上游
+[subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs) 发布，最后一个为 2016 年 5 月的 0.9.3.7。
 
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0
