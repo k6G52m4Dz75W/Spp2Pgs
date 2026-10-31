@@ -6,26 +6,35 @@
 格式遵循 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [0.10.3] - 2026-10-31
+## [0.11.0] - 2026-10-31
 
 ### 新增
+- `build_sppf.bat rebuild` 走全量重建（`/t:Rebuild`），日志写入
+  `build_sppf_rebuild.log`；不带该参数时仍为增量构建，日志写入 `build_sppf.log`。
+  增量构建会跳过未改动的工程，其警告数量因而少于全量构建。
 - 两份 README 顶部各加一个构建徽章，点击跳到工作流页面。
 
 ### 变更
+- 合入 xy-VSFilter 上游 `532b756`（2023-02），渲染器随之换代。所合入的改动除
+  下一条外均为播放器侧行为，本工具产出的 PGS 不受影响。
+- 渲染器开始识别 `LayoutResX` / `LayoutResY`。此前这两个头被当作无法识别的行
+  跳过。字幕声明它们时，渲染先按该分辨率栅格化，再放大到输出画布：字号、位置
+  与换行均不变，边缘略软，`.sup` 约大 5–6%。`LayoutRes` 等于输出分辨率时输出
+  逐字节不变，未声明时与 0.10.1 完全相同。详见 README「脚本分辨率与 LayoutRes」。
 - 工作流在每次推送到 `main` 时也会运行，不再只在推 tag 时运行。此前编译坏掉
   可能一直留在树里，直到有人想起来手动触发一次；现在一次推送就会自行编译两个
   二进制并跑回归样例。推 tag 仍会继续创建 draft release。
+- 工作流设置 30 分钟超时，不再沿用默认的六小时；某一步卡住时任务会失败，
+  而不是一直占着运行器。
 - `.gitattributes` 把 `.github/workflows/*.yml` 与它本身钉为 LF。此前在
   `core.autocrlf` 下两者以 LF 存、以 CRLF 检出，导致每次检出都显示被修改、
   每次 add 都输出一条警告。
-
-## [0.10.2] - 2026-10-31
-
-### 变更
-- 工作流设置 30 分钟超时，不再沿用默认的六小时；某一步卡住时任务会失败，
-  而不是一直占着运行器。
 - 退出码 3 的表述在各处统一。此前帮助文本写「an unexpected error」、README 写
   「an exception」、0.10.1 写「an escaped exception」，现统一为「未处理的异常」。
+
+### 修复
+- 调试信息的生成格式改为 `/DEBUG:FULL`，不再使用 `/DEBUG:FASTLINK` 这一已被
+  工具链移除的格式，编译时因此不再输出 LNK4315。
 
 ## [0.10.1] - 2026-10-31
 
@@ -110,7 +119,6 @@
 本记录从 0.10.0 开始。此前的版本由上游
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs) 发布，最后一个为 2016 年 5 月的 0.9.3.7。
 
-[0.10.3]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.3
-[0.10.2]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.2
+[0.11.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.11.0
 [0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0

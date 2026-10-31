@@ -6,28 +6,43 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.3] - 2026-10-31
+## [0.11.0] - 2026-10-31
 
 ### Added
+- `build_sppf.bat rebuild` runs a full rebuild (`/t:Rebuild`) and writes to
+  `build_sppf_rebuild.log`; without the argument the build stays incremental and
+  writes to `build_sppf.log`. An incremental build skips the projects that did
+  not change, so it reports fewer warnings than a full one.
 - A build badge at the top of both READMEs, linking to the workflow.
 
 ### Changed
+- Merged xy-VSFilter upstream `532b756` (2023-02), which replaces the renderer.
+  Everything merged is player-side behaviour except the entry below; the PGS
+  output of this tool is unaffected.
+- The renderer now honours `LayoutResX` / `LayoutResY`. These headers were
+  previously skipped as unrecognised lines. When a script declares them it is
+  rasterised at that resolution and scaled up to the output canvas: font size,
+  position and line breaking are unchanged, edges are slightly softer and the
+  `.sup` grows by roughly 5-6%. If `LayoutRes` equals the output resolution the
+  output is byte-identical, and without the headers nothing differs from 0.10.1.
+  See "Script resolution and LayoutRes" in the README.
 - The workflow runs on every push to `main`, not only when a tag is pushed. A
   broken build could previously sit in the tree until someone remembered to
   start a run by hand; a push now builds both binaries and runs the regression
   samples on its own. A tag still carries on to the draft release.
+- The workflow gives up after 30 minutes instead of the default six hours, so a
+  step that hangs fails the job instead of holding the runner.
 - `.gitattributes` pins `.github/workflows/*.yml` and itself to LF. Stored with
   LF and checked out with CRLF under `core.autocrlf`, the two were reported as
   modified after every checkout and drew a warning on every add.
-
-## [0.10.2] - 2026-10-31
-
-### Changed
-- The workflow gives up after 30 minutes instead of the default six hours, so a
-  step that hangs fails the job instead of holding the runner.
 - Exit status 3 is described the same way everywhere. The help text said "an
   unexpected error", the README said "an exception" and 0.10.1 said "an escaped
   exception"; all three say "an unhandled exception" now.
+
+### Fixed
+- Debug information is generated as `/DEBUG:FULL` rather than
+  `/DEBUG:FASTLINK`, a format the toolset has dropped, so LNK4315 is no longer
+  reported.
 
 ## [0.10.1] - 2026-10-31
 
@@ -143,7 +158,6 @@ This changelog begins at 0.10.0. Earlier releases were published upstream at
 [subelf/Spp2Pgs](https://github.com/subelf/Spp2Pgs), the last of them 0.9.3.7 in
 May 2016.
 
-[0.10.3]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.3
-[0.10.2]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.2
+[0.11.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.11.0
 [0.10.1]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1
 [0.10.0]: https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.0

@@ -17,33 +17,24 @@ start.
 
 ## What's new
 
-**0.10.1** — 2026-10-31 · [full changelog](CHANGELOG.md) · [release](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.10.1)
+**0.11.0** — 2026-10-31 · [full changelog](CHANGELOG.md) · [release](https://github.com/k6G52m4Dz75W/Spp2Pgs/releases/tag/0.11.0)
 
-- **HDR output.** `-h[<nits>]` writes a BT.2020 ST 2084 (PQ) palette, for
-  pairing with HDR video. White defaults to 203 nits, the graphics white of
-  BT.2408, and is capped at 500. Without the option the output is unchanged.
-- **The last line is no longer dropped** from a subtitle file that has no
-  trailing line break.
-- **A pointer truncation in the x64 rasterizer is fixed**, inherited from
-  upstream.
-- **Failures say what went wrong.** The temporary folder, the free and the
-  required space, the Windows error code with a plain-language hint, the
-  HRESULT of a failed input open, and a missing or wrong-bitness xy-VSSppf DLL
-  named as such -- where the old build printed `code 0` or "Unknown exception".
-- **Temporary space is sized from the video** instead of reserving a fixed
-  4 GiB for every run.
-- **It builds again.** `build_sppf.bat` and `build_core.bat` drive Visual
-  Studio 2026 (v145) and SDK 10.0.26100; the toolset v100/v140 that the
-  solutions themselves reference can no longer be installed.
-- **64-bit only.** The 32-bit build and the .NET wrapper are no longer produced:
-  the configurations are still in the project files, but no build emits them.
-- **Option letters are case insensitive**, and help moved to `-help` so that
-  `-h` could become the HDR switch. `-H203` still works.
-- **The exit status means something.** 0 is a written file, 1 a bad command
-  line, 2 a failed conversion, 3 an unhandled exception. A run that worked used
-  to exit with 1, the same code a mistyped command line gave.
-- **Builds run on GitHub Actions**, which compiles both binaries from the tagged
-  source and runs a regression check on them, instead of taking an upload.
+- **A new renderer.** Merged xy-VSFilter upstream from 2023-02. Everything merged
+  is player-side behaviour except the entry below; the PGS output is unaffected.
+- **`LayoutResX` / `LayoutResY` are honoured.** A script that declares them is
+  rasterised at that resolution and scaled up to the output canvas: font size,
+  position and line breaking are unchanged, edges are slightly softer and the
+  `.sup` grows by roughly 5-6%. Without them the output is byte-identical to
+  0.10.1. See "Script resolution and LayoutRes" below.
+- **Full rebuilds.** `build_sppf.bat rebuild` runs `/t:Rebuild` and logs
+  separately from the incremental build, so the warning counts of the two can be
+  compared directly.
+- **LNK4315 is gone.** Debug information no longer uses `/DEBUG:FASTLINK`, which
+  the toolset has dropped.
+- **Repository side**: a build badge in both READMEs; the workflow builds both
+  binaries and runs the regression samples on every push to `main`, with a
+  30 minute timeout; `.gitattributes` pins the workflow files to LF.
+- **Exit status 3** is described as "an unhandled exception" everywhere.
 
 That is the headline only; [`CHANGELOG.md`](CHANGELOG.md) has every entry.
 
@@ -148,6 +139,42 @@ original disc played as an ISO too. A correct HDR pipeline renders the 143 of
 `-h203` and the 234 of the SDR output at the same brightness, because both are
 203 nits. If the HDR variant looks darker than the SDR one, the player is
 skipping PQ for PG streams -- use the SDR output until it does.
+
+## Script resolution and LayoutRes
+Two resolutions are involved and are easy to confuse:
+
+- The **output canvas** is set by `-s`, where `-s 1080p` means 1920x1080. There
+  is no default; it has to be given.
+- The **script coordinate system** is set by `PlayResX` / `PlayResY` in the
+  subtitle. **When they are absent it is 384x288.**
+
+Font size is scaled by the output height over `PlayResY`, which is 3.75 at
+1080p: a size 14 script lands at 52.5 px on screen, and `MarginV` scales the
+same way. Writing the target resolution into `PlayResX` / `PlayResY` makes the
+font size the final pixel size, with no arithmetic to do:
+
+```
+PlayResX: 1920
+PlayResY: 1080
+```
+
+With `ScaledBorderAndShadow: yes`, the outline is scaled horizontally by the
+output width over `PlayResX` and vertically by the output height over
+`PlayResY`. The two agree only when the aspect ratio of `PlayRes` matches that
+of the picture; the absent default of 384x288 is 4:3, so against a 16:9 picture
+the horizontal border is 4/3 thicker than the vertical one. Give `PlayRes` the
+same ratio as the picture and the two agree, at which point the switch changes
+nothing. Without the switch, the `Outline` and `Shadow` numbers are final
+pixels.
+
+`LayoutResX` / `LayoutResY` exist so that one script can serve several
+resolutions: when both are present and greater than 0, the frame is rasterised
+at that size and scaled up to the output canvas. Font size, position and line
+breaking are unchanged, edges are slightly softer and the `.sup` grows by
+roughly 5-6%. Border and shadow follow that value only when
+`ScaledBorderAndShadow` is not `yes`. The output canvas of this tool is fixed,
+so the feature has nothing to offer here and **is best left out**; when a
+subtitle arrives with it, deleting the two lines restores the 0.10.1 behaviour.
 
 ## Building
 Two scripts in the repository root, run in this order:
