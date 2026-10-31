@@ -17,6 +17,7 @@
 *----------------------------------------------------------------------------*/
 
 #include "stdafx.h"
+#include "../../Version.h"
 
 using namespace System;
 using namespace System::Reflection;
@@ -33,7 +34,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
 
-[assembly:AssemblyVersionAttribute("0.9.1.0")];
+[assembly:AssemblyVersionAttribute(SPP2PGS_VERSION_STR)];
 
 [assembly:ComVisible(false)];
 
