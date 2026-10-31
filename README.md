@@ -150,8 +150,8 @@ Three sizes are involved, from three different sources:
 | Name | Source | Default | Role |
 |---|---|---|---|
 | Output canvas | the `-s` option | none; the run fails without it | final size of the PGS image, and the scaling target of the other two |
-| Script coordinate system `PlayRes` | `PlayResX` / `PlayResY` headers | 384x288 | basis for font size, margins and alignment |
-| Rasterisation base `LayoutRes` | `LayoutResX` / `LayoutResY` headers | the output canvas | basis for `\be`, `\blur`, `\frx`, `\fry`, border and shadow |
+| Script coordinate system `PlayRes` | `[Script Info]` keys `PlayResX` / `PlayResY` | 384x288 | basis for font size, margins and alignment |
+| Rasterisation base `LayoutRes` | `[Script Info]` keys `LayoutResX` / `LayoutResY` | the output canvas | basis for `\be`, `\blur`, `\frx`, `\fry`, border and shadow |
 
 `PlayRes` and `LayoutRes` are independent: the first defines the coordinate
 system, the second the rasterisation size.
@@ -201,16 +201,19 @@ scaled up to the output canvas.
   widens with the upscale
 - `.sup` size: roughly 5-6% larger
 
-When `LayoutRes` equals the output canvas, or neither header is present, the
+When `LayoutRes` equals the output canvas, or neither setting is present, the
 output is byte-identical to 0.10.1.
 
-The two headers are not ignored: they declare the rasterisation base the author
-chose, and ignoring them would depart from what the file says. The output canvas
-of this tool is fixed and needs no reuse across resolutions, so a script written
-for this tool needs neither header; a script that carries them normally comes
-from another tool, and rendering it as declared matches what the author saw.
-0.10.1 does not recognise them and always rasterises at the output canvas, so
-remove the two lines when the old output is wanted.
+How this tool handles them:
+
+- Ignored or not: not ignored. The two settings declare the rasterisation base the
+  author chose, and ignoring them would depart from what the file says.
+- Scripts written for this tool: neither setting is needed, because the output
+  canvas is fixed and nothing is reused across resolutions.
+- Scripts written elsewhere: rendered as declared, which matches what the author
+  saw.
+- Reproducing 0.10.1 output: remove the two lines; the old version does not
+  recognise them and always rasterises at the output canvas.
 
 ## Building
 Two scripts in the repository root, run in this order:
