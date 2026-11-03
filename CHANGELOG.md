@@ -22,10 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unaffected.
 - The renderer now honours `LayoutResX` / `LayoutResY`. These headers were
   previously skipped as unrecognised lines. When a script declares them it is
-  rasterised at that resolution and scaled up to the output canvas: font size,
-  position and line breaking are unchanged, glyph and border outlines keep their
-  size while the antialiasing gradient widens, and the `.sup` grows by roughly
-  5-6%. If `LayoutRes` equals the output canvas, or neither header is present,
+  laid out at that size and scaled to the output frame: font size, position
+  and line breaking are unchanged, glyph and border outlines keep their size
+  while the antialiasing gradient widens, and the `.sup` grows by roughly
+  5-6%. If `LayoutRes` equals the output frame, or neither header is present,
   the output is byte-identical to 0.10.1. See "PlayRes and LayoutRes" in the
   README.
 - The workflow runs on every push to `main`, not only when a tag is pushed. A
@@ -42,6 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   exception"; all three say "an unhandled exception" now.
 
 ### Fixed
+- In the BT.709 to BT.2020 matrix of the HDR palette, the B-row term fed by R is
+  `0.0164` instead of `0.0165`, matching the exact BT.2087 value `0.0163914`.
+- That term does not change existing HDR output: the difference stays below one
+  code value after PQ encoding and 8-bit YCbCr quantisation, so a given input
+  produces a byte-identical `.sup` before and after.
 - Debug information is generated as `/DEBUG:FULL` rather than
   `/DEBUG:FASTLINK`, a format the toolset has dropped, so LNK4315 is no longer
   reported.

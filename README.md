@@ -24,10 +24,10 @@ start.
   Everything merged is player-side behaviour except the entry below; the PGS
   output is unaffected.
 - **`LayoutResX` / `LayoutResY` are honoured.** A script that declares them is
-  rasterised at that resolution and scaled up to the output canvas: font size,
-  position and line breaking are unchanged, glyph and border outlines keep their
-  size while the antialiasing gradient widens, and the `.sup` grows by roughly
-  5-6%. Without them the output is byte-identical to 0.10.1. See "PlayRes and
+  laid out at that size and scaled to the output frame: font size, position and
+  line breaking are unchanged, glyph and border outlines keep their size while
+  the antialiasing gradient widens, and the `.sup` grows by roughly 5-6%.
+  Without them the output is byte-identical to 0.10.1. See "PlayRes and
   LayoutRes" below.
 - **Full rebuilds.** `build_sppf.bat rebuild` runs `/t:Rebuild` and logs
   separately from the incremental build, so the warning counts of the two can be
@@ -147,14 +147,16 @@ skipping PQ for PG streams -- use the SDR output until it does.
 
 Three sizes are involved, from three different sources:
 
-| Name | Source | Default | Role |
+| Name | Source | When omitted | Role |
 |---|---|---|---|
-| Output canvas | the `-s` option | none; the run fails without it | final size of the PGS image, and the scaling target of the other two |
-| Script coordinate system `PlayRes` | `[Script Info]` keys `PlayResX` / `PlayResY` | 384x288 | basis for font size, margins and alignment |
-| Rasterisation base `LayoutRes` | `[Script Info]` keys `LayoutResX` / `LayoutResY` | the output canvas | basis for `\be`, `\blur`, `\frx`, `\fry`, border and shadow |
+| `Frame format` | the `-s` option | exits with an error | picture size of the generated `.sup` |
+| `PlayResX` / `PlayResY` | `[Script Info]` keys | 384x288 | the picture size the subtitle is meant to be rendered at |
+| `LayoutResX` / `LayoutResY` | `[Script Info]` keys | the output frame | the picture size the script was laid out for |
 
-`PlayRes` and `LayoutRes` are independent: the first defines the coordinate
-system, the second the rasterisation size.
+`PlayRes` and `LayoutRes` are independent. The first is the conversion between
+script values and pixels: editing it moves the text and changes its size. The
+second is the picture size the script was laid out for: editing it changes
+neither position nor size, only whether an extra scaling step is needed.
 
 ### PlayRes
 
@@ -190,24 +192,33 @@ scaled.
 
 ### LayoutRes
 
-`LayoutResX` / `LayoutResY` define the rasterisation size. They take effect when
-both are present and greater than 0: the frame is rasterised at that size and
-scaled up to the output canvas.
+`LayoutResX` / `LayoutResY` declare the picture size the script was laid out
+for. The libass format guide requires the native display resolution of the
+video rather than its storage resolution: a 720x576 16:9 PAL DVD is written as
+1024x576. The same guide advises new scripts to give `PlayRes` and `LayoutRes`
+the same values.
+
+The output frame of this tool comes from `-s` and is independent of that
+declaration. When the declared size differs from the output frame, the picture
+is laid out at `LayoutRes` first and then scaled:
+
+    scale factor = output frame / LayoutRes
 
 - font size, position, line breaking: unchanged
+- `\be`, `\blur`, `\frx`, `\fry` and the 3D perspective: by the scale factor
 - border and shadow: unchanged when `ScaledBorderAndShadow` is `yes`, otherwise
-  scaled with `LayoutRes`
-- glyph and border edges: outlines keep their size, the antialiasing gradient
-  widens with the upscale
-- `.sup` size: roughly 5-6% larger
+  thicker or thinner by the scale factor
+- antialiasing: the gradient changes in proportion to the scale factor
+- `.sup` size: 5-6% larger without blur, about 40% larger with `\blur10`
 
-When `LayoutRes` equals the output canvas, or neither setting is present, the
-output is byte-identical to 0.10.1.
+When `LayoutRes` equals the output frame, or neither setting is present, the
+scale factor is 1 and the output is byte-identical to 0.10.1.
 
-- **They are not ignored.** The two settings declare the rasterisation base the
-  author chose, and ignoring them would depart from what the file says.
-- **They are not required.** The output canvas of this tool is fixed and nothing
-  is reused across resolutions, so a script written for it needs neither.
+- **They are not ignored.** The two settings declare the layout base the author
+  chose, and ignoring them would depart from what the file says.
+- **They are not required.** A run of this tool produces one `.sup` at one size,
+  fixed by `-s` and never rescaled afterwards, so a script written for it needs
+  neither.
 - Removing the two lines makes the program behave as 0.10.1 and earlier did.
 
 ## Building
