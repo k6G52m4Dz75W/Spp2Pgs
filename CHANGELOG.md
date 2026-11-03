@@ -44,9 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - In the BT.709 to BT.2020 matrix of the HDR palette, the B-row term fed by R is
   `0.0164` instead of `0.0165`, matching the exact BT.2087 value `0.0163914`.
-- That term does not change existing HDR output: the difference stays below one
-  code value after PQ encoding and 8-bit YCbCr quantisation, so a given input
-  produces a byte-identical `.sup` before and after.
 - Debug information is generated as `/DEBUG:FULL` rather than
   `/DEBUG:FASTLINK`, a format the toolset has dropped, so LNK4315 is no longer
   reported.
